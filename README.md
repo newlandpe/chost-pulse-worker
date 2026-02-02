@@ -278,16 +278,6 @@ For most small-to-medium servers, the free tier is sufficient.
 - [ChostPulse PocketMine Plugin](../pocketmine-mp/)
 - [ChostPulse Java Plugin](../java-edition/)
 
-## License
-
-MIT
-
-## Support
-
-- GitHub Issues: [github.com/your-username/chost-pulse-worker](https://github.com/your-username/chost-pulse-worker)
-- Cloudflare Docs: [Workers Documentation](https://developers.cloudflare.com/workers/)
-- Discord: [Your Discord Server]
-
 ## Contributing
 
 1. Fork the repository
