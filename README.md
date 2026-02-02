@@ -144,22 +144,23 @@ Health check endpoint.
 ## Project Structure
 
 ```
-├── src/
-│   ├── index.ts              # Main entry point & routing
-│   ├── handlers/
-│   │   ├── heartbeat.ts      # POST /api/heartbeat handler
-│   │   └── badge.ts          # GET /api/badge handler
-│   ├── security/
-│   │   ├── crypto.ts         # SHA-256 hashing utilities
-│   │   └── validator.ts      # Token validation
-│   └── utils/
-│       └── colors.ts         # Badge color schemes
-├── test/
-│   └── worker.test.ts        # Unit tests
-├── package.json
-├── tsconfig.json
-├── wrangler.toml             # Cloudflare Worker configuration
-└── README.md
+.
++-- src/
+|   +-- index.ts              # Main entry point & routing
+|   +-- handlers/
+|   |   +-- heartbeat.ts      # POST /api/heartbeat handler
+|   |   \-- badge.ts          # GET /api/badge handler
+|   +-- security/
+|   |   +-- crypto.ts         # SHA-256 hashing utilities
+|   |   \-- validator.ts      # Token validation
+|   \-- utils/
+|       \-- colors.ts         # Badge color schemes
++-- test/
+|   \-- worker.test.ts        # Unit tests
++-- package.json
++-- tsconfig.json
++-- wrangler.toml             # Cloudflare Worker configuration
+\-- README.md
 ```
 
 ## Security Model
