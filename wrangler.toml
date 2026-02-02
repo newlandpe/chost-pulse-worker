@@ -1,0 +1,25 @@
+name = "chost-pulse-worker"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Global KV binding for local and preview
+[[kv_namespaces]]
+binding = "PULSE_KV"
+id = "your-kv-namespace-id"
+preview_id = "your-kv-namespace-preview-id"
+
+[env.production]
+name = "chost-pulse-worker"
+route = "your-domain.com/*"
+
+[[env.production.kv_namespaces]]
+binding = "PULSE_KV"
+id = "your-production-kv-namespace-id"
+
+[env.development]
+name = "chost-pulse-worker-dev"
+
+[[env.development.kv_namespaces]]
+binding = "PULSE_KV"
+id = "your-dev-kv-namespace-id"
