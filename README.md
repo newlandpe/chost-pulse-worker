@@ -4,13 +4,13 @@ ChostPulse Worker is a serverless backend built on Cloudflare Workers for real-t
 
 ## Features
 
-- **Edge Architecture**: High-performance monitoring using Cloudflare Workers and V8 Isolates.
-- **Serverless Storage**: Distributed data persistence using Cloudflare KV without traditional databases.
-- **Dynamic Badges**: Real-time SVG generation for status, player counts, TPS, and versioning.
-- **Cryptographic Security**: Secure public IDs derived from secret tokens via SHA-256 hashing.
-- **Auto-Offline Detection**: Automatic data expiry using a 300-second TTL for accurate status tracking.
-- **Global Caching**: Optimized 60-second CDN caching to ensure fast badge loading globally.
-- **API Integration**: Lightweight REST endpoints with CORS support for seamless plugin connectivity.
+- **Edge Computing & V8 Isolates**: Runs on Cloudflare’s global network with zero cold starts, ensuring sub-millisecond execution for incoming telemetry data.
+- **Distributed KV Persistence**: Implements a stateless architecture using Cloudflare KV for distributed key-value storage without the overhead of traditional databases.
+- **Dynamic SVG Generation**: Features an on-the-fly rendering engine that generates customizable SVG badges for status, player counts, TPS, and versioning.
+- **One-Way Cryptographic Security**: Protects sensitive tokens by using SHA-256 hashing to derive public IDs, preventing secret discovery even if public IDs are exposed.
+- **Automated State Expiry**: Utilizes logical TTL (300 seconds) to ensure that stale data is automatically purged, reflecting the true real-time status of monitored servers.
+- **Edge Cache Optimization**: Integrated 60-second CDN caching for SVG badges to minimize KV read operations and maximize global delivery speed.
+- **Full CORS & PSR-style Compatibility**: Lightweight REST API designed for seamless integration with Minecraft plugins (PocketMine-MP, Java) and web frontends.
 
 ## Prerequisites
 
