@@ -20,7 +20,7 @@
     "pocketmine"
   ],
   "author": "ChernegaSergiy",
-  "license": "SEE LICENSE",
+  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "badge-maker": "^5.0.2"
   },
