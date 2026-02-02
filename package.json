@@ -1,0 +1,34 @@
+{
+  "name": "chost-pulse-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for ChostPulse monitoring system",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:dev": "wrangler deploy --env development",
+    "deploy:prod": "wrangler deploy --env production",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "cf-typegen": "wrangler types"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "monitoring",
+    "badge",
+    "pocketmine"
+  ],
+  "author": "ChernegaSergiy",
+  "license": "MIT",
+  "dependencies": {
+    "badge-maker": "^3.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.1.0",
+    "@cloudflare/workers-types": "^4.20240129.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0",
+    "wrangler": "^3.25.0"
+  }
+}
