@@ -1,6 +1,7 @@
 import { makeBadge } from 'badge-maker';
 import { getColorForMetric } from '../utils/colors';
 import { Env } from '../index';
+import * as simpleIcons from 'simple-icons';
 
 /** Describes server data stored in KV. */
 export interface ServerData {
@@ -36,24 +37,24 @@ export async function handleBadge(
   const publicId = url.searchParams.get('id');
   const type = url.searchParams.get('type') || 'status';
 
+  // Parse badge customization options early for error badges
+  const options = parseBadgeOptions(url.searchParams);
+
   if (!publicId) {
-    return createErrorBadge('Missing ID', corsHeaders);
+    return await createErrorBadge('Missing ID', corsHeaders, options);
   }
 
   // Validate public ID format
   if (!publicId.startsWith('srv_pub_')) {
-    return createErrorBadge('Invalid ID', corsHeaders);
+    return await createErrorBadge('Invalid ID', corsHeaders, options);
   }
-
-  // Parse badge customization options
-  const options = parseBadgeOptions(url.searchParams);
 
   // Fetch from KV
   const dataJson = await env.PULSE_KV.get(publicId);
 
   if (!dataJson) {
     // Server offline or data expired
-    return createOfflineBadge(corsHeaders, options);
+    return await createOfflineBadge(corsHeaders, options);
   }
 
   try {
@@ -63,7 +64,7 @@ export async function handleBadge(
     const age = Date.now() - data.timestamp;
     if (age > 300000) {
       // 5 minutes
-      return createOfflineBadge(corsHeaders, options);
+      return await createOfflineBadge(corsHeaders, options);
     }
 
     // Generate badge based on type
@@ -85,7 +86,7 @@ export async function handleBadge(
     });
   } catch (error) {
     console.error('Badge generation error:', error);
-    return createErrorBadge('Error', corsHeaders, options);
+    return await createErrorBadge('Error', corsHeaders, options);
   }
 }
 
@@ -189,10 +190,10 @@ function getDefaultBadgeParams(
 type BadgeStyle = 'flat' | 'flat-square' | 'plastic' | 'for-the-badge' | 'social';
 
 
-function createOfflineBadge(
+async function createOfflineBadge(
   corsHeaders: Record<string, string>,
   options?: BadgeOptions
-): Response {
+): Promise<Response> {
   const badgeParams: Record<string, unknown> = {
     label: 'server',
     message: 'offline',
@@ -213,6 +214,14 @@ function createOfflineBadge(
 
   if (options?.style) {
     badgeParams.style = options.style as BadgeStyle;
+  }
+
+  // Fetch and apply simple-icons logo if provided
+  if (options?.logo) {
+    const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
+    if (logoBase64) {
+      badgeParams.logoBase64 = logoBase64;
+    }
   }
 
   if (options?.link) {
@@ -236,11 +245,11 @@ function createOfflineBadge(
   });
 }
 
-function createErrorBadge(
+async function createErrorBadge(
   message: string,
   corsHeaders: Record<string, string>,
   options?: BadgeOptions
-): Response {
+): Promise<Response> {
   const badgeParams: Record<string, unknown> = {
     label: 'error',
     message,
@@ -251,8 +260,12 @@ function createErrorBadge(
     badgeParams.style = options.style as BadgeStyle;
   }
 
+  // Fetch and apply simple-icons logo if provided
   if (options?.logo) {
-    badgeParams.logo = options.logo;
+    const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
+    if (logoBase64) {
+      badgeParams.logoBase64 = logoBase64;
+    }
   }
 
   if (options?.link) {
@@ -341,22 +354,22 @@ function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
 /** Fetch SVG logo from simple-icons CDN and convert to base64 */
 async function fetchLogoBase64(slug: string, color?: string): Promise<string | undefined> {
   try {
-    const url = `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${slug}.svg`;
-    const response = await fetch(url);
+    // Convert slug to simple-icons format (e.g., "python" -> "siPython")
+    const iconKey = `si${slug.charAt(0).toUpperCase()}${slug.slice(1).toLowerCase()}` as keyof typeof simpleIcons;
+    const icon = simpleIcons[iconKey];
     
-    if (!response.ok) {
+    if (!icon || typeof icon !== 'object' || !('path' in icon)) {
       return undefined;
     }
     
-    let svgContent = await response.text();
+    // Get the hex color from the icon or use custom color
+    const fillColor = color || `#${icon.hex}`;
     
-    // Apply custom color to SVG if provided
-    if (color) {
-      svgContent = svgContent.replace(/fill="#[0-9a-f]{6}"/gi, `fill="${color}"`);
-    }
+    // Build SVG from path
+    const svgContent = `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="${fillColor}"><path d="${icon.path}"/></svg>`;
     
-    // Convert SVG to base64
-    const base64 = Buffer.from(svgContent).toString('base64');
+    // Convert SVG to base64 using btoa (Cloudflare Workers compatible)
+    const base64 = btoa(svgContent);
     return `data:image/svg+xml;base64,${base64}`;
   } catch (error) {
     return undefined;
