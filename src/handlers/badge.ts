@@ -20,6 +20,7 @@ export interface BadgeOptions {
   logo?: string;
   logoColor?: string;
   logoSize?: string;
+  logoBase64?: string;
   label?: string;
   labelColor?: string;
   color?: string;
@@ -116,8 +117,10 @@ async function generateBadge(
     badgeParams.style = options.style as BadgeStyle;
   }
 
-  // Fetch and apply simple-icons logo if provided
-  if (options.logo) {
+  // Apply logo (prioritize logoBase64 over logo)
+  if (options.logoBase64) {
+    badgeParams.logoBase64 = decodeURIComponent(options.logoBase64);
+  } else if (options.logo) {
     const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
     if (logoBase64) {
       badgeParams.logoBase64 = logoBase64;
@@ -216,8 +219,10 @@ async function createOfflineBadge(
     badgeParams.style = options.style as BadgeStyle;
   }
 
-  // Fetch and apply simple-icons logo if provided
-  if (options?.logo) {
+  // Apply logo (prioritize logoBase64 over logo)
+  if (options?.logoBase64) {
+    badgeParams.logoBase64 = decodeURIComponent(options.logoBase64);
+  } else if (options?.logo) {
     const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
     if (logoBase64) {
       badgeParams.logoBase64 = logoBase64;
@@ -260,8 +265,10 @@ async function createErrorBadge(
     badgeParams.style = options.style as BadgeStyle;
   }
 
-  // Fetch and apply simple-icons logo if provided
-  if (options?.logo) {
+  // Apply logo (prioritize logoBase64 over logo)
+  if (options?.logoBase64) {
+    badgeParams.logoBase64 = decodeURIComponent(options.logoBase64);
+  } else if (options?.logo) {
     const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
     if (logoBase64) {
       badgeParams.logoBase64 = logoBase64;
@@ -343,6 +350,7 @@ function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
     logo: params.get('logo') ?? undefined,
     logoColor: params.get('logoColor') ?? undefined,
     logoSize: params.get('logoSize') ?? undefined,
+    logoBase64: params.get('logoBase64') ?? undefined,
     label: params.get('label') ?? undefined,
     labelColor: params.get('labelColor') ?? undefined,
     color: params.get('color') ?? undefined,
