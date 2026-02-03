@@ -35,6 +35,7 @@ type BadgeStyle = 'flat' | 'flat-square' | 'plastic' | 'for-the-badge' | 'social
 class BadgeGenerator {
   constructor(private corsHeaders: Record<string, string>) {}
 
+  /** Generates an SVG badge response based on server data and options. */
   async generate(
     dataJson: string | null,
     type: string,
@@ -50,6 +51,7 @@ class BadgeGenerator {
     }
   }
 
+  /** Builds badge parameters based on server data availability and staleness. */
   private async buildParams(
     dataJson: string | null,
     type: string,
@@ -73,6 +75,7 @@ class BadgeGenerator {
     return params;
   }
 
+  /** Checks if server data is stale based on dynamic timeout calculation. */
   private isStaleData(data: ServerData): boolean {
     let staleMs = 300000; // Default 5 minutes
     if (data.heartbeatIntervalSec && data.heartbeatIntervalSec > 0) {
@@ -82,6 +85,7 @@ class BadgeGenerator {
     return age > staleMs;
   }
 
+  /** Returns default badge parameters for the requested badge type. */
   private getTypeParams(type: string, data: ServerData): Record<string, unknown> {
     switch (type) {
       case 'status':
@@ -134,6 +138,7 @@ class BadgeGenerator {
     }
   }
 
+  /** Builds parameters for offline server badge. */
   private buildOfflineParams(options: BadgeOptions): Record<string, unknown> {
     const params: Record<string, unknown> = {
       label: 'server',
@@ -146,6 +151,7 @@ class BadgeGenerator {
     return params;
   }
 
+  /** Builds parameters for error badge. */
   private buildErrorParams(message: string): Record<string, unknown> {
     return {
       label: 'error',
@@ -154,6 +160,7 @@ class BadgeGenerator {
     };
   }
 
+  /** Applies user-provided customizations to badge parameters. */
   private async applyCustomizations(
     params: Record<string, unknown>,
     options?: BadgeOptions
@@ -191,6 +198,7 @@ class BadgeGenerator {
     }
   }
 
+  /** Fetches SVG logo from simple-icons package and converts to base64. */
   private async fetchLogoBase64(slug: string, color?: string): Promise<string | undefined> {
     try {
       const iconKey = `si${slug.charAt(0).toUpperCase()}${slug.slice(1).toLowerCase()}` as keyof typeof simpleIcons;
@@ -209,6 +217,7 @@ class BadgeGenerator {
     }
   }
 
+  /** Creates HTTP response with SVG badge and appropriate headers. */
   private respond(
     params: Record<string, unknown>,
     options?: BadgeOptions,
@@ -259,6 +268,7 @@ export async function handleBadge(
 }
 
 
+/** Parses and validates server data from JSON string. */
 function parseServerData(dataJson: string): ServerData {
   const parsed = JSON.parse(dataJson) as Record<string, unknown>;
 
@@ -302,6 +312,7 @@ function parseServerData(dataJson: string): ServerData {
   };
 }
 
+/** Parses badge customization options from URL query parameters. */
 function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
   const cacheSecondsParam = params.get('cacheSeconds');
   let cacheSeconds: number | undefined;
