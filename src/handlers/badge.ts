@@ -25,7 +25,7 @@ export interface BadgeOptions {
   labelColor?: string;
   color?: string;
   cacheSeconds?: number;
-  link?: string;
+  links?: string;
 }
 
 /** Builds badge responses from KV-stored data. */
@@ -128,7 +128,7 @@ async function generateBadge(
   }
 
   if (options.link) {
-    badgeParams.link = [decodeURIComponent(options.link)];
+    badgeParams.links = [decodeURIComponent(options.link)];
   }
 
   return makeBadge(badgeParams);
@@ -229,8 +229,8 @@ async function createOfflineBadge(
     }
   }
 
-  if (options?.link) {
-    badgeParams.link = [decodeURIComponent(options.link)];
+  if (options?.links) {
+    badgeParams.links = [decodeURIComponent(options.links)];
   }
 
   const badge = makeBadge(badgeParams);
@@ -275,8 +275,8 @@ async function createErrorBadge(
     }
   }
 
-  if (options?.link) {
-    badgeParams.link = [decodeURIComponent(options.link)];
+  if (options?.links) {
+    badgeParams.links = [decodeURIComponent(options.links)];
   }
 
   const badge = makeBadge(badgeParams);
@@ -355,7 +355,7 @@ function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
     labelColor: params.get('labelColor') ?? undefined,
     color: params.get('color') ?? undefined,
     cacheSeconds,
-    link: params.get('link') ?? undefined,
+    links: params.get('links') ?? undefined,
   };
 }
 
