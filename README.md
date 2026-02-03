@@ -14,7 +14,7 @@ ChostPulse Worker is a serverless backend built on Cloudflare Workers for real-t
 
 ## Prerequisites
 
-- Node.js (v18 or higher recommended)
+- Node.js (v20 or higher recommended)
 - npm or yarn package manager
 - Cloudflare account
 - Wrangler CLI
