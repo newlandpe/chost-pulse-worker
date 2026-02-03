@@ -13,7 +13,7 @@ const CORS_HEADERS: Record<string, string> = {
 };
 
 /** Handles incoming HTTP requests for the worker. */
-export async function fetch(request: Request, env: Env): Promise<Response> {
+async function fetch(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
 
   // Handle CORS preflight
@@ -50,3 +50,5 @@ export async function fetch(request: Request, env: Env): Promise<Response> {
     headers: CORS_HEADERS,
   });
 }
+
+export default { fetch };
