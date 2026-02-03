@@ -1,6 +1,23 @@
 /**
  * Derives a public ID from a secret token using SHA-256
  */
+async function getWebCrypto(): Promise<Crypto> {
+  if (globalThis.crypto && globalThis.crypto.subtle) {
+    return globalThis.crypto;
+  }
+
+  try {
+    const nodeCrypto = await import('node:crypto');
+    if (nodeCrypto.webcrypto) {
+      return nodeCrypto.webcrypto as unknown as Crypto;
+    }
+  } catch {
+    // ignore and throw below
+  }
+
+  throw new Error('Web Crypto API is not available');
+}
+
 export async function derivePublicId(secretToken: string): Promise<string> {
   // Remove prefix
   const cleanToken = secretToken.replace('sk_live_', '');
@@ -8,7 +25,8 @@ export async function derivePublicId(secretToken: string): Promise<string> {
   // Hash using Web Crypto API
   const encoder = new TextEncoder();
   const data = encoder.encode(cleanToken);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const webCrypto = await getWebCrypto();
+  const hashBuffer = await webCrypto.subtle.digest('SHA-256', data);
 
   // Convert to hex
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -24,7 +42,8 @@ export async function derivePublicId(secretToken: string): Promise<string> {
 export async function sha256(text: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const webCrypto = await getWebCrypto();
+  const hashBuffer = await webCrypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
