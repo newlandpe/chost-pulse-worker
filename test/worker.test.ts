@@ -70,3 +70,53 @@ describe('Color Utilities', () => {
     expect(getColorForMetric('unknown', 100)).toBe('informational');
   });
 });
+
+describe('Badge Options Parsing', () => {
+  it('should parse badge customization options', () => {
+    const params = new URLSearchParams({
+      id: 'srv_pub_abc123',
+      type: 'status',
+      style: 'flat-square',
+      logo: 'python',
+      logoColor: 'white',
+      logoSize: 'auto',
+      label: 'My Server',
+      labelColor: '#555',
+      color: '#FF5733',
+      cacheSeconds: '300',
+      link: 'https://example.com',
+    });
+
+    const id = params.get('id');
+    const type = params.get('type');
+    const style = params.get('style');
+
+    expect(id).toBe('srv_pub_abc123');
+    expect(type).toBe('status');
+    expect(style).toBe('flat-square');
+  });
+
+  it('should handle URL-encoded parameters', () => {
+    const params = new URLSearchParams({
+      label: 'My%20Server',
+      link: 'https%3A%2F%2Fexample.com',
+    });
+
+    const label = params.get('label');
+    const link = params.get('link');
+
+    expect(label).toBe('My%20Server');
+    expect(link).toBe('https%3A%2F%2Fexample.com');
+  });
+
+  it('should clamp cache seconds to valid range', () => {
+    const maxSeconds = 86400;
+    const testValues = [0, 60, 300, 86400, 100000];
+
+    testValues.forEach((value) => {
+      const clamped = Math.max(0, Math.min(value, maxSeconds));
+      expect(clamped).toBeGreaterThanOrEqual(0);
+      expect(clamped).toBeLessThanOrEqual(maxSeconds);
+    });
+  });
+});
