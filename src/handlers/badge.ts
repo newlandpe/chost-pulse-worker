@@ -1,4 +1,4 @@
-import { makeBadge } from 'badge-maker';
+import { makeBadge, Format } from 'badge-maker';
 import { getColorForMetric } from '../utils/colors';
 import { Env } from '../index';
 import * as simpleIcons from 'simple-icons';
@@ -132,11 +132,11 @@ async function generateBadge(
     }
   }
 
-  if (options.link) {
-    badgeParams.links = [decodeURIComponent(options.link)];
+  if (options.links) {
+    badgeParams.links = [decodeURIComponent(options.links)];
   }
 
-  return makeBadge(badgeParams);
+  return makeBadge(badgeParams as Format);
 }
 
 function getDefaultBadgeParams(
@@ -238,7 +238,7 @@ async function createOfflineBadge(
     badgeParams.links = [decodeURIComponent(options.links)];
   }
 
-  const badge = makeBadge(badgeParams);
+  const badge = makeBadge(badgeParams as Format);
 
   const cacheSeconds = options?.cacheSeconds ?? 60;
   const cacheControl =
@@ -284,7 +284,7 @@ async function createErrorBadge(
     badgeParams.links = [decodeURIComponent(options.links)];
   }
 
-  const badge = makeBadge(badgeParams);
+  const badge = makeBadge(badgeParams as Format);
 
   const cacheSeconds = options?.cacheSeconds ?? 60;
   const cacheControl =
