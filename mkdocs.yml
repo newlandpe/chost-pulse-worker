@@ -1,0 +1,98 @@
+site_name: Chost Pulse Worker
+site_description: Cloudflare Worker for ChostPulse monitoring and badge delivery.
+site_url: https://newlandpe.github.io/chost-pulse-worker
+
+repo_name: newlandpe/chost-pulse-worker
+repo_url: https://github.com/newlandpe/chost-pulse-worker
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2026 Serhii Cherneha
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.tabs
+    - navigation.footer
+    - content.code.copy
+    - content.code.annotate
+    - content.code.select
+    - content.tooltips
+    - content.action.edit
+    - content.action.view
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep-orange
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep-orange
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+nav:
+  - Home: index.md
+  - API:
+    - Heartbeat: api/heartbeat.md
+    - Badge: api/badge.md
+    - Health: api/health.md
+  - Deployment: deployment.md
+  - Security: security.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: datetime
+  - git-committers:
+      repository: newlandpe/chost-pulse-worker
+      branch: main
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/newlandpe
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/nland_pe
+    - icon: fontawesome/brands/instagram
+      link: https://www.instagram.com/newlandpe
+    - icon: fontawesome/brands/facebook
+      link: https://www.facebook.com/newlandpe
