@@ -2,6 +2,17 @@
 
 The `/api/badge` endpoint generates customizable SVG badges displaying server status and metrics. Badges are rendered in real-time based on data stored in the KV namespace.
 
+## Stale Data Handling
+
+Badges automatically detect when server data is stale (no recent heartbeat) and display "offline" status:
+
+- **Dynamic Timeout**: Uses `heartbeatIntervalSec` from heartbeat payload to calculate offline detection delay
+- **Formula**: `timeout = max(60s, min(300s, heartbeatIntervalSec × 2))`
+- **Default**: 5 minutes if `heartbeatIntervalSec` not provided
+- **Purpose**: Prevents false offline alerts while maintaining responsive monitoring
+
+Example: A server with 30-second heartbeats will show offline after 60 seconds of silence.
+
 ## Endpoint
 
 ```
@@ -21,8 +32,8 @@ GET /api/badge
     - `status` - Server online/offline status
     - `players` - Current players count: `X/max`
     - `tps` - Ticks per second with color coding
-    - `software` - Server software name
-    - `version` - Server version string
+    - `software` - Game server engine/core name
+    - `version` - Server version (game version, world version, etc.)
 
 ### Customization
 
@@ -71,6 +82,10 @@ GET /api/badge
     - Supports full URLs
     - Must be URL encoded
     - Example: `link=https%3A%2F%2Fexample.com` (renders as clickable link)
+
+- **`links`** - Alias for `link` parameter
+    - Same functionality as `link`
+    - Example: `links=https%3A%2F%2Fexample.com`
 
 ## Response
 

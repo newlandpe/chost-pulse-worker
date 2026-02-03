@@ -27,7 +27,8 @@ Content-Type: application/json
     "maxPlayers": 100,
     "tps": 19.8,
     "software": "PocketMine-MP",
-    "version": "5.0.0"
+    "version": "5.0.0",
+    "heartbeatIntervalSec": 30
   }
 }
 ```
@@ -65,13 +66,18 @@ Server status information object.
 
 ##### `data.software` (optional)
 - Type: `string`
-- Example: `"PocketMine-MP"`, `"Nukkit"`, `"BDS"`
-- Description: Server software name
+- Example: `"PocketMine-MP 5.0.0"`, `"Nukkit"`
+- Description: Game server software/engine name with its version
 
 ##### `data.version` (required)
 - Type: `string`
-- Example: `"5.0.0"`
-- Description: Server software version
+- Example: `"1.21.50"`, `"1.20.1"`
+- Description: Server version (e.g., game version, world version)
+
+##### `data.heartbeatIntervalSec` (optional)
+- Type: `number`
+- Example: `30`, `60`
+- Description: Heartbeat sending interval in seconds. Used to calculate dynamic offline detection timeout (2× interval, clamped 60-300 seconds). If not provided, defaults to 5 minutes (300 seconds).
 
 ## Response Format
 
@@ -128,10 +134,23 @@ Result: `srv_pub_a1b2c3d4e5f6`
 Data is stored in Cloudflare KV with:
 
 - **Key**: Public ID (e.g., `srv_pub_a1b2c3d4e5f6`)
-- **Value**: JSON object with server data + timestamp
+- **Value**: JSON object with server data + timestamp + heartbeatIntervalSec
 - **TTL**: 5 minutes (300 seconds)
 
-After 5 minutes without a heartbeat, the data expires and badges show "offline".
+### Dynamic Offline Detection
+
+The badge endpoint uses `heartbeatIntervalSec` to calculate when to mark a server as offline:
+
+```
+staleTimeoutMs = max(60000, min(300000, heartbeatIntervalSec × 2000))
+```
+
+- **Default**: 5 minutes (300,000 ms) if `heartbeatIntervalSec` is not provided
+- **Formula**: 2× the heartbeat interval
+- **Minimum**: 60 seconds (prevent rapid toggling)
+- **Maximum**: 300 seconds (keep monitoring responsive)
+
+Example: If a server sends heartbeats every 30 seconds, offline detection triggers after 60 seconds of silence.
 
 ## Example
 
@@ -146,7 +165,8 @@ curl -X POST https://your-worker.workers.dev/api/heartbeat \
       "maxPlayers": 100,
       "tps": 19.8,
       "software": "PocketMine-MP",
-      "version": "5.0.0"
+      "version": "5.0.0",
+      "heartbeatIntervalSec": 30
     }
   }'
 ```

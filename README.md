@@ -95,10 +95,11 @@ Accepts server statistics from game server plugins.
     "data": {
         "status": "online",
         "players": 124,
-        "max_players": 200,
+        "maxPlayers": 200,
         "tps": 19.9,
-        "software": "PocketMine-MP 5.30.0",
-        "version": "1.21.50"
+        "software": "PocketMine-MP 5.0.0",
+        "version": "1.21.50",
+        "heartbeatIntervalSec": 30
     }
 }
 ```
@@ -115,17 +116,37 @@ Accepts server statistics from game server plugins.
 
 ### GET /api/badge
 
-Generates SVG badges for display.
+Generates SVG badges for display with customizable appearance and real-time server status.
 
 **Query Parameters:**
 
 * `id` (required): Public ID (srv_pub_xxx)
-* `type` (optional): Badge type (status, players, tps, software, version)
+* `type` (optional): Badge type - `status`, `players`, `tps`, `software`, `version` (default: status)
+* `style` (optional): Badge style - `flat`, `flat-square`, `plastic`, `for-the-badge`, `social`
+* `logo` (optional): Icon slug from [simple-icons](https://simpleicons.org)
+* `logoColor` (optional): Color override for logo (hex/css color)
+* `label` (optional): Override left-side text
+* `labelColor` (optional): Background color of left section
+* `color` (optional): Background color of right section (message)
+* `cacheSeconds` (optional): HTTP cache lifetime in seconds (0-86400, default: 60)
+* `links` (optional): URL to navigate when badge is clicked
+
+**Dynamic Stale Timeout:**
+
+Server badges automatically detect stale data based on `heartbeatIntervalSec` from heartbeat:
+
+```
+timeout = max(60s, min(300s, heartbeatIntervalSec × 2))
+```
+
+Default: 5 minutes if heartbeatIntervalSec not provided.
 
 **Examples:**
 
-* `https://your-domain.com/api/badge?id=srv_pub_xxx&type=status`
-* `https://your-domain.com/api/badge?id=srv_pub_xxx&type=players`
+* Basic status: `https://your-domain.com/api/badge?id=srv_pub_xxx&type=status`
+* Players count: `https://your-domain.com/api/badge?id=srv_pub_xxx&type=players`
+* With logo: `https://your-domain.com/api/badge?id=srv_pub_xxx&type=status&logo=minecraft`
+* Custom colors: `https://your-domain.com/api/badge?id=srv_pub_xxx&color=brightgreen&labelColor=555`
 
 ### GET /health
 
