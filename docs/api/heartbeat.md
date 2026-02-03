@@ -66,7 +66,7 @@ Server status information object.
 
 ##### `data.software` (optional)
 - Type: `string`
-- Example: `"PocketMine-MP 5.0.0"`, `"Nukkit"`
+- Example: `"PocketMine-MP 5.0.0"`, `"Nukkit 1.0.10"`
 - Description: Game server software/engine name with its version
 
 ##### `data.version` (required)
