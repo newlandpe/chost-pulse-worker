@@ -237,11 +237,17 @@ function createOfflineBadge(
 
   const badge = makeBadge(badgeParams);
 
+  const cacheSeconds = options?.cacheSeconds ?? 60;
+  const cacheControl =
+    cacheSeconds > 0
+      ? `public, max-age=${Math.min(cacheSeconds, 86400)}`
+      : 'no-cache';
+
   return new Response(badge, {
     headers: {
       ...corsHeaders,
       'Content-Type': 'image/svg+xml',
-      'Cache-Control': 'public, max-age=60',
+      'Cache-Control': cacheControl,
     },
   });
 }
@@ -279,11 +285,18 @@ function createErrorBadge(
 
   const badge = makeBadge(badgeParams);
 
+  const cacheSeconds = options?.cacheSeconds ?? 60;
+  const cacheControl =
+    cacheSeconds > 0
+      ? `public, max-age=${Math.min(cacheSeconds, 86400)}`
+      : 'no-cache';
+
   return new Response(badge, {
     status: 400,
     headers: {
       ...corsHeaders,
       'Content-Type': 'image/svg+xml',
+      'Cache-Control': cacheControl,
     },
   });
 }
@@ -327,9 +340,14 @@ function parseServerData(dataJson: string): ServerData {
 
 function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
   const cacheSecondsParam = params.get('cacheSeconds');
-  const cacheSeconds = cacheSecondsParam
-    ? Math.max(0, Math.min(parseInt(cacheSecondsParam, 10), 86400))
-    : undefined;
+  let cacheSeconds: number | undefined;
+  
+  if (cacheSecondsParam) {
+    const parsed = parseInt(cacheSecondsParam, 10);
+    if (!isNaN(parsed)) {
+      cacheSeconds = Math.max(0, Math.min(parsed, 86400));
+    }
+  }
 
   return {
     style: params.get('style') ?? undefined,
@@ -339,7 +357,7 @@ function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
     label: params.get('label') ?? undefined,
     labelColor: params.get('labelColor') ?? undefined,
     color: params.get('color') ?? undefined,
-    cacheSeconds: cacheSeconds ?? undefined,
+    cacheSeconds,
     link: params.get('link') ?? undefined,
   };
 }
