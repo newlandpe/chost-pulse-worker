@@ -12,6 +12,7 @@ export interface ServerData {
   software?: string;
   version: string;
   timestamp: number;
+  heartbeatIntervalSec?: number;
 }
 
 /** Badge customization options from query parameters. */
@@ -61,10 +62,14 @@ export async function handleBadge(
   try {
     const data = parseServerData(dataJson);
 
-    // Check if data is stale (older than 5 minutes)
+    // Check if data is stale using dynamic timeout based on heartbeat interval
+    let staleMs = 300000; // Default 5 minutes
+    if (data.heartbeatIntervalSec && data.heartbeatIntervalSec > 0) {
+      // Use 2× heartbeat interval, clamped between 60s and 300s
+      staleMs = Math.max(60000, Math.min(300000, data.heartbeatIntervalSec * 2000));
+    }
     const age = Date.now() - data.timestamp;
-    if (age > 300000) {
-      // 5 minutes
+    if (age > staleMs) {
       return await createOfflineBadge(corsHeaders, options);
     }
 
@@ -307,6 +312,7 @@ function parseServerData(dataJson: string): ServerData {
   const software = parsed['software'];
   const version = parsed['version'];
   const timestamp = parsed['timestamp'];
+  const heartbeatIntervalSec = parsed['heartbeatIntervalSec'];
 
   if (
     typeof status !== 'string' ||
@@ -323,6 +329,10 @@ function parseServerData(dataJson: string): ServerData {
     throw new Error('Invalid server data format');
   }
 
+  if (heartbeatIntervalSec !== undefined && typeof heartbeatIntervalSec !== 'number') {
+    throw new Error('Invalid server data format');
+  }
+
   return {
     status,
     players,
@@ -331,6 +341,7 @@ function parseServerData(dataJson: string): ServerData {
     software,
     version,
     timestamp,
+    heartbeatIntervalSec,
   };
 }
 
