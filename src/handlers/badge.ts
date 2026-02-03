@@ -29,6 +29,209 @@ export interface BadgeOptions {
   links?: string;
 }
 
+type BadgeStyle = 'flat' | 'flat-square' | 'plastic' | 'for-the-badge' | 'social';
+
+/** Generates SVG badges from server data. */
+class BadgeGenerator {
+  constructor(private corsHeaders: Record<string, string>) {}
+
+  async generate(
+    dataJson: string | null,
+    type: string,
+    options: BadgeOptions
+  ): Promise<Response> {
+    try {
+      const params = await this.buildParams(dataJson, type, options);
+      return this.respond(params, options);
+    } catch (error) {
+      console.error('Badge generation error:', error);
+      const params = this.buildErrorParams('Error');
+      return this.respond(params, options, 400);
+    }
+  }
+
+  private async buildParams(
+    dataJson: string | null,
+    type: string,
+    options: BadgeOptions
+  ): Promise<Record<string, unknown>> {
+    // No data or stale data → offline badge
+    if (!dataJson) {
+      return this.buildOfflineParams(options);
+    }
+
+    const data = parseServerData(dataJson);
+    const isStale = this.isStaleData(data);
+
+    if (isStale) {
+      return this.buildOfflineParams(options);
+    }
+
+    // Build params for requested badge type
+    const params = this.getTypeParams(type, data);
+    await this.applyCustomizations(params, options);
+    return params;
+  }
+
+  private isStaleData(data: ServerData): boolean {
+    let staleMs = 300000; // Default 5 minutes
+    if (data.heartbeatIntervalSec && data.heartbeatIntervalSec > 0) {
+      staleMs = Math.max(60000, Math.min(300000, data.heartbeatIntervalSec * 2000));
+    }
+    const age = Date.now() - data.timestamp;
+    return age > staleMs;
+  }
+
+  private getTypeParams(type: string, data: ServerData): Record<string, unknown> {
+    switch (type) {
+      case 'status':
+        return {
+          label: 'server',
+          message: data.status,
+          color: data.status === 'online' ? 'brightgreen' : 'red',
+        };
+
+      case 'players':
+        return {
+          label: 'players',
+          message: `${data.players}/${data.maxPlayers}`,
+          color: 'blue',
+        };
+
+      case 'tps':
+        return {
+          label: 'tps',
+          message: data.tps.toFixed(1),
+          color: getColorForMetric('tps', data.tps),
+        };
+
+      case 'software':
+        return data.software
+          ? {
+              label: 'software',
+              message: data.software,
+              color: 'blueviolet',
+            }
+          : {
+              label: 'software',
+              message: 'unknown',
+              color: 'lightgrey',
+            };
+
+      case 'version':
+        return {
+          label: 'version',
+          message: data.version,
+          color: 'informational',
+        };
+
+      default:
+        return {
+          label: 'server',
+          message: data.status,
+          color: 'brightgreen',
+        };
+    }
+  }
+
+  private buildOfflineParams(options: BadgeOptions): Record<string, unknown> {
+    const params: Record<string, unknown> = {
+      label: 'server',
+      message: 'offline',
+      color: 'red',
+    };
+    if (options?.label) {
+      params.label = decodeURIComponent(options.label);
+    }
+    return params;
+  }
+
+  private buildErrorParams(message: string): Record<string, unknown> {
+    return {
+      label: 'error',
+      message,
+      color: 'critical',
+    };
+  }
+
+  private async applyCustomizations(
+    params: Record<string, unknown>,
+    options?: BadgeOptions
+  ): Promise<void> {
+    if (!options) return;
+
+    if (options.label) {
+      params.label = decodeURIComponent(options.label);
+    }
+
+    if (options.labelColor) {
+      params.labelColor = options.labelColor;
+    }
+
+    if (options.color) {
+      params.color = options.color;
+    }
+
+    if (options.style) {
+      params.style = options.style as BadgeStyle;
+    }
+
+    // Logo handling
+    if (options.logoBase64) {
+      params.logoBase64 = decodeURIComponent(options.logoBase64);
+    } else if (options.logo) {
+      const logoBase64 = await this.fetchLogoBase64(options.logo, options.logoColor);
+      if (logoBase64) {
+        params.logoBase64 = logoBase64;
+      }
+    }
+
+    if (options.links) {
+      params.links = [decodeURIComponent(options.links)];
+    }
+  }
+
+  private async fetchLogoBase64(slug: string, color?: string): Promise<string | undefined> {
+    try {
+      const iconKey = `si${slug.charAt(0).toUpperCase()}${slug.slice(1).toLowerCase()}` as keyof typeof simpleIcons;
+      const icon = simpleIcons[iconKey];
+
+      if (!icon || typeof icon !== 'object' || !('path' in icon)) {
+        return undefined;
+      }
+
+      const fillColor = color || `#${icon.hex}`;
+      const svgContent = `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="${fillColor}"><path d="${icon.path}"/></svg>`;
+      const base64 = btoa(svgContent);
+      return `data:image/svg+xml;base64,${base64}`;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  private respond(
+    params: Record<string, unknown>,
+    options?: BadgeOptions,
+    status?: number
+  ): Response {
+    const badge = makeBadge(params as unknown as Format);
+    const cacheSeconds = options?.cacheSeconds ?? 60;
+    const cacheControl =
+      cacheSeconds > 0
+        ? `public, max-age=${Math.min(cacheSeconds, 86400)}`
+        : 'no-cache';
+
+    return new Response(badge, {
+      status: status ?? 200,
+      headers: {
+        ...this.corsHeaders,
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': cacheControl,
+      },
+    });
+  }
+}
+
 /** Builds badge responses from KV-stored data. */
 export async function handleBadge(
   request: Request,
@@ -38,269 +241,23 @@ export async function handleBadge(
   const url = new URL(request.url);
   const publicId = url.searchParams.get('id');
   const type = url.searchParams.get('type') || 'status';
-
-  // Parse badge customization options early for error badges
   const options = parseBadgeOptions(url.searchParams);
 
   if (!publicId) {
-    return await createErrorBadge('Missing ID', corsHeaders, options);
+    const generator = new BadgeGenerator(corsHeaders);
+    return generator.generate(null, type, { ...options, label: 'Missing ID' });
   }
 
-  // Validate public ID format
   if (!publicId.startsWith('srv_pub_')) {
-    return await createErrorBadge('Invalid ID', corsHeaders, options);
+    const generator = new BadgeGenerator(corsHeaders);
+    return generator.generate(null, type, { ...options, label: 'Invalid ID' });
   }
 
-  // Fetch from KV
   const dataJson = await env.PULSE_KV.get(publicId);
-
-  if (!dataJson) {
-    // Server offline or data expired
-    return await createOfflineBadge(corsHeaders, options);
-  }
-
-  try {
-    const data = parseServerData(dataJson);
-
-    // Check if data is stale using dynamic timeout based on heartbeat interval
-    let staleMs = 300000; // Default 5 minutes
-    if (data.heartbeatIntervalSec && data.heartbeatIntervalSec > 0) {
-      // Use 2× heartbeat interval, clamped between 60s and 300s
-      staleMs = Math.max(60000, Math.min(300000, data.heartbeatIntervalSec * 2000));
-    }
-    const age = Date.now() - data.timestamp;
-    if (age > staleMs) {
-      return await createOfflineBadge(corsHeaders, options);
-    }
-
-    // Generate badge based on type
-    const badge = await generateBadge(type, data, options);
-
-    // Determine cache time
-    const cacheSeconds = options.cacheSeconds ?? 60;
-    const cacheControl =
-      cacheSeconds > 0
-        ? `public, max-age=${Math.min(cacheSeconds, 86400)}`
-        : 'no-cache';
-
-    return new Response(badge, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'image/svg+xml',
-        'Cache-Control': cacheControl,
-      },
-    });
-  } catch (error) {
-    console.error('Badge generation error:', error);
-    return await createErrorBadge('Error', corsHeaders, options);
-  }
+  const generator = new BadgeGenerator(corsHeaders);
+  return generator.generate(dataJson, type, options);
 }
 
-async function generateBadge(
-  type: string,
-  data: ServerData,
-  options: BadgeOptions
-): Promise<string> {
-  const badgeParams = getDefaultBadgeParams(type, data);
-
-  // Apply custom label if provided
-  if (options.label) {
-    badgeParams.label = decodeURIComponent(options.label);
-  }
-
-  // Apply custom colors
-  if (options.labelColor) {
-    badgeParams.labelColor = options.labelColor;
-  }
-
-  if (options.color) {
-    badgeParams.color = options.color;
-  }
-
-  // Apply badge-maker specific options
-  if (options.style) {
-    badgeParams.style = options.style as BadgeStyle;
-  }
-
-  // Apply logo (prioritize logoBase64 over logo)
-  if (options.logoBase64) {
-    badgeParams.logoBase64 = decodeURIComponent(options.logoBase64);
-  } else if (options.logo) {
-    const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
-    if (logoBase64) {
-      badgeParams.logoBase64 = logoBase64;
-    }
-  }
-
-  if (options.links) {
-    badgeParams.links = [decodeURIComponent(options.links)];
-  }
-
-  return makeBadge(badgeParams as Format);
-}
-
-function getDefaultBadgeParams(
-  type: string,
-  data: ServerData
-): Record<string, unknown> {
-  switch (type) {
-    case 'status':
-      return {
-        label: 'server',
-        message: data.status,
-        color: data.status === 'online' ? 'brightgreen' : 'red',
-      };
-
-    case 'players':
-      return {
-        label: 'players',
-        message: `${data.players}/${data.maxPlayers}`,
-        color: 'blue',
-      };
-
-    case 'tps':
-      return {
-        label: 'tps',
-        message: data.tps.toFixed(1),
-        color: getColorForMetric('tps', data.tps),
-      };
-
-    case 'software':
-      if (data.software) {
-        return {
-          label: 'software',
-          message: data.software,
-          color: 'blueviolet',
-        };
-      }
-      return {
-        label: 'software',
-        message: 'unknown',
-        color: 'lightgrey',
-      };
-
-    case 'version':
-      return {
-        label: 'version',
-        message: data.version,
-        color: 'informational',
-      };
-
-    default:
-      return {
-        label: 'server',
-        message: data.status,
-        color: 'brightgreen',
-      };
-  }
-}
-
-type BadgeStyle = 'flat' | 'flat-square' | 'plastic' | 'for-the-badge' | 'social';
-
-
-async function createOfflineBadge(
-  corsHeaders: Record<string, string>,
-  options?: BadgeOptions
-): Promise<Response> {
-  const badgeParams: Record<string, unknown> = {
-    label: 'server',
-    message: 'offline',
-    color: 'red',
-  };
-
-  if (options?.label) {
-    badgeParams.label = decodeURIComponent(options.label);
-  }
-
-  if (options?.labelColor) {
-    badgeParams.labelColor = options.labelColor;
-  }
-
-  if (options?.color) {
-    badgeParams.color = options.color;
-  }
-
-  if (options?.style) {
-    badgeParams.style = options.style as BadgeStyle;
-  }
-
-  // Apply logo (prioritize logoBase64 over logo)
-  if (options?.logoBase64) {
-    badgeParams.logoBase64 = decodeURIComponent(options.logoBase64);
-  } else if (options?.logo) {
-    const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
-    if (logoBase64) {
-      badgeParams.logoBase64 = logoBase64;
-    }
-  }
-
-  if (options?.links) {
-    badgeParams.links = [decodeURIComponent(options.links)];
-  }
-
-  const badge = makeBadge(badgeParams as Format);
-
-  const cacheSeconds = options?.cacheSeconds ?? 60;
-  const cacheControl =
-    cacheSeconds > 0
-      ? `public, max-age=${Math.min(cacheSeconds, 86400)}`
-      : 'no-cache';
-
-  return new Response(badge, {
-    headers: {
-      ...corsHeaders,
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': cacheControl,
-    },
-  });
-}
-
-async function createErrorBadge(
-  message: string,
-  corsHeaders: Record<string, string>,
-  options?: BadgeOptions
-): Promise<Response> {
-  const badgeParams: Record<string, unknown> = {
-    label: 'error',
-    message,
-    color: 'critical',
-  };
-
-  if (options?.style) {
-    badgeParams.style = options.style as BadgeStyle;
-  }
-
-  // Apply logo (prioritize logoBase64 over logo)
-  if (options?.logoBase64) {
-    badgeParams.logoBase64 = decodeURIComponent(options.logoBase64);
-  } else if (options?.logo) {
-    const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
-    if (logoBase64) {
-      badgeParams.logoBase64 = logoBase64;
-    }
-  }
-
-  if (options?.links) {
-    badgeParams.links = [decodeURIComponent(options.links)];
-  }
-
-  const badge = makeBadge(badgeParams as Format);
-
-  const cacheSeconds = options?.cacheSeconds ?? 60;
-  const cacheControl =
-    cacheSeconds > 0
-      ? `public, max-age=${Math.min(cacheSeconds, 86400)}`
-      : 'no-cache';
-
-  return new Response(badge, {
-    status: 400,
-    headers: {
-      ...corsHeaders,
-      'Content-Type': 'image/svg+xml',
-      'Cache-Control': cacheControl,
-    },
-  });
-}
 
 function parseServerData(dataJson: string): ServerData {
   const parsed = JSON.parse(dataJson) as Record<string, unknown>;
@@ -368,29 +325,4 @@ function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
     cacheSeconds,
     links: params.get('links') ?? undefined,
   };
-}
-
-/** Fetch SVG logo from simple-icons CDN and convert to base64 */
-async function fetchLogoBase64(slug: string, color?: string): Promise<string | undefined> {
-  try {
-    // Convert slug to simple-icons format (e.g., "python" -> "siPython")
-    const iconKey = `si${slug.charAt(0).toUpperCase()}${slug.slice(1).toLowerCase()}` as keyof typeof simpleIcons;
-    const icon = simpleIcons[iconKey];
-    
-    if (!icon || typeof icon !== 'object' || !('path' in icon)) {
-      return undefined;
-    }
-    
-    // Get the hex color from the icon or use custom color
-    const fillColor = color || `#${icon.hex}`;
-    
-    // Build SVG from path
-    const svgContent = `<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="${fillColor}"><path d="${icon.path}"/></svg>`;
-    
-    // Convert SVG to base64 using btoa (Cloudflare Workers compatible)
-    const base64 = btoa(svgContent);
-    return `data:image/svg+xml;base64,${base64}`;
-  } catch (error) {
-    return undefined;
-  }
 }
