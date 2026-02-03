@@ -1,18 +1,7 @@
-/**
- * Derives a public ID from a secret token using SHA-256
- */
 async function getWebCrypto(): Promise<Crypto> {
-  if (globalThis.crypto && globalThis.crypto.subtle) {
-    return globalThis.crypto;
-  }
-
-  try {
-    const nodeCrypto = await import('node:crypto');
-    if (nodeCrypto.webcrypto) {
-      return nodeCrypto.webcrypto as unknown as Crypto;
-    }
-  } catch {
-    // ignore and throw below
+  const globalCrypto = (globalThis as { crypto?: Crypto }).crypto;
+  if (globalCrypto && globalCrypto.subtle) {
+    return globalCrypto;
   }
 
   throw new Error('Web Crypto API is not available');
