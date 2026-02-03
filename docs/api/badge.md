@@ -13,64 +13,64 @@ GET /api/badge
 ### Required
 
 - **`id`** - The public server identifier (format: `srv_pub_XXXXXXXXXXXX`)
-  - Example: `id=srv_pub_a1b2c3d4e5f6`
+    - Example: `id=srv_pub_a1b2c3d4e5f6`
 
 ### Badge Type
 
 - **`type`** - Badge display type (default: `status`)
-  - `status` - Server online/offline status
-  - `players` - Current players count: `X/max`
-  - `tps` - Ticks per second with color coding
-  - `software` - Server software name
-  - `version` - Server version string
+    - `status` - Server online/offline status
+    - `players` - Current players count: `X/max`
+    - `tps` - Ticks per second with color coding
+    - `software` - Server software name
+    - `version` - Server version string
 
 ### Customization
 
 - **`style`** - Badge visual style
-  - Supported values: `flat`, `flat-square`, `plastic`, `for-the-badge`, `social`
-  - Default: `flat`
-  - Example: `style=flat-square`
+    - Supported values: `flat`, `flat-square`, `plastic`, `for-the-badge`, `social`
+    - Default: `flat`
+    - Example: `style=flat-square`
 
 - **`logo`** - Icon slug from [simple-icons](https://simpleicons.org)
-  - Supports any icon slug available in simple-icons
-  - Click icon title on simple-icons to copy the slug
-  - Example: `logo=python` (renders Python logo)
-  - Example: `logo=node.js`
+    - Supports any icon slug available in simple-icons
+    - Click icon title on simple-icons to copy the slug
+    - Example: `logo=python` (renders Python logo)
+    - Example: `logo=node.js`
 
 - **`logoColor`** - Color of the logo (hex, rgb, rgba, hsl, hsla, or CSS color names)
-  - Only supported for simple-icons logos
-  - Example: `logoColor=white` or `logoColor=%23FF5733`
+    - Only supported for simple-icons logos
+    - Example: `logoColor=white` or `logoColor=%23FF5733`
 
 - **`logoSize`** - Logo sizing strategy
-  - `auto` - Adapts logo size responsively (useful for wider logos like `amd`, `amg`)
-  - Default: Standard sizing
-  - Example: `logoSize=auto`
+    - `auto` - Adapts logo size responsively (useful for wider logos like `amd`, `amg`)
+    - Default: Standard sizing
+    - Example: `logoSize=auto`
 
 - **`label`** - Override the left-hand-side text
-  - Supports URL encoding for spaces and special characters
-  - Example: `label=My%20Server` (renders "My Server")
-  - Default: Type-specific label (`server`, `players`, `tps`, etc.)
+    - Supports URL encoding for spaces and special characters
+    - Example: `label=My%20Server` (renders "My Server")
+    - Default: Type-specific label (`server`, `players`, `tps`, etc.)
 
 - **`labelColor`** - Background color of the left section
-  - Hex, rgb, rgba, hsl, hsla, or CSS named colors
-  - Example: `labelColor=%23555` or `labelColor=darkgray`
+    - Hex, rgb, rgba, hsl, hsla, or CSS named colors
+    - Example: `labelColor=%23555` or `labelColor=darkgray`
 
 - **`color`** - Background color of the right section (message)
-  - Hex, rgb, rgba, hsl, hsla, or CSS named colors
-  - Overrides default color for the badge type
-  - Example: `color=%23FF6B6B` or `color=brightgreen`
+    - Hex, rgb, rgba, hsl, hsla, or CSS named colors
+    - Overrides default color for the badge type
+    - Example: `color=%23FF6B6B` or `color=brightgreen`
 
 - **`cacheSeconds`** - HTTP cache lifetime in seconds
-  - Range: 0 - 86400 (24 hours)
-  - Default: 60 seconds
-  - Set to 0 for no caching
-  - Values above 86400 are capped at 86400
-  - Example: `cacheSeconds=300` (5 minute cache)
+    - Range: 0 - 86400 (24 hours)
+    - Default: 60 seconds
+    - Set to 0 for no caching
+    - Values above 86400 are capped at 86400
+    - Example: `cacheSeconds=300` (5 minute cache)
 
 - **`link`** - URL to navigate when badge is clicked
-  - Supports full URLs
-  - Must be URL encoded
-  - Example: `link=https%3A%2F%2Fexample.com` (renders as clickable link)
+    - Supports full URLs
+    - Must be URL encoded
+    - Example: `link=https%3A%2F%2Fexample.com` (renders as clickable link)
 
 ## Response
 
@@ -162,10 +162,10 @@ GET /api/badge?id=srv_pub_a1b2c3d4e5f6&type=players&style=for-the-badge&logo=pla
 
 - **Message**: Ticks per second (1 decimal)
 - **Color**: Dynamic based on performance
-  - ≥19.0 TPS: brightgreen
-  - ≥15.0 TPS: yellow
-  - ≥10.0 TPS: orange
-  - <10.0 TPS: red
+    - ≥19.0 TPS: brightgreen
+    - ≥15.0 TPS: yellow
+    - ≥10.0 TPS: orange
+    - <10.0 TPS: red
 - **Use case**: Server performance monitoring
 - **Data dependency**: `tps` field
 
@@ -200,6 +200,7 @@ Access-Control-Allow-Methods: GET, OPTIONS
 ## Color Format Support
 
 All color parameters accept:
+
 - **Hex**: `%23FF5733` (URL-encoded `#FF5733`)
 - **RGB**: `rgb(255,87,51)`
 - **RGBA**: `rgba(255,87,51,0.8)`
