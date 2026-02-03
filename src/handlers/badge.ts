@@ -13,6 +13,19 @@ export interface ServerData {
   timestamp: number;
 }
 
+/** Badge customization options from query parameters. */
+export interface BadgeOptions {
+  style?: string;
+  logo?: string;
+  logoColor?: string;
+  logoSize?: string;
+  label?: string;
+  labelColor?: string;
+  color?: string;
+  cacheSeconds?: number;
+  link?: string;
+}
+
 /** Builds badge responses from KV-stored data. */
 export async function handleBadge(
   request: Request,
@@ -32,12 +45,15 @@ export async function handleBadge(
     return createErrorBadge('Invalid ID', corsHeaders);
   }
 
+  // Parse badge customization options
+  const options = parseBadgeOptions(url.searchParams);
+
   // Fetch from KV
   const dataJson = await env.PULSE_KV.get(publicId);
 
   if (!dataJson) {
     // Server offline or data expired
-    return createOfflineBadge(corsHeaders);
+    return createOfflineBadge(corsHeaders, options);
   }
 
   try {
@@ -47,84 +63,179 @@ export async function handleBadge(
     const age = Date.now() - data.timestamp;
     if (age > 300000) {
       // 5 minutes
-      return createOfflineBadge(corsHeaders);
+      return createOfflineBadge(corsHeaders, options);
     }
 
     // Generate badge based on type
-    const badge = generateBadge(type, data);
+    const badge = generateBadge(type, data, options);
+
+    // Determine cache time
+    const cacheSeconds = options.cacheSeconds ?? 60;
+    const cacheControl =
+      cacheSeconds > 0
+        ? `public, max-age=${Math.min(cacheSeconds, 86400)}`
+        : 'no-cache';
 
     return new Response(badge, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'public, max-age=60',
+        'Cache-Control': cacheControl,
       },
     });
   } catch (error) {
     console.error('Badge generation error:', error);
-    return createErrorBadge('Error', corsHeaders);
+    return createErrorBadge('Error', corsHeaders, options);
   }
 }
 
-function generateBadge(type: string, data: ServerData): string {
+function generateBadge(
+  type: string,
+  data: ServerData,
+  options: BadgeOptions
+): string {
+  const badgeParams = getDefaultBadgeParams(type, data);
+
+  // Apply custom label if provided
+  if (options.label) {
+    badgeParams.label = decodeURIComponent(options.label);
+  }
+
+  // Apply custom colors
+  if (options.labelColor) {
+    badgeParams.labelColor = options.labelColor;
+  }
+
+  if (options.color) {
+    badgeParams.color = options.color;
+  }
+
+  // Apply badge-maker specific options
+  if (options.style) {
+    badgeParams.style = options.style as BadgeStyle;
+  }
+
+  if (options.logo) {
+    badgeParams.logo = options.logo;
+  }
+
+  if (options.logoColor) {
+    badgeParams.logoColor = options.logoColor;
+  }
+
+  if (options.logoSize) {
+    badgeParams.logoSize = options.logoSize;
+  }
+
+  if (options.link) {
+    badgeParams.link = [decodeURIComponent(options.link)];
+  }
+
+  return makeBadge(badgeParams);
+}
+
+function getDefaultBadgeParams(
+  type: string,
+  data: ServerData
+): Record<string, unknown> {
   switch (type) {
     case 'status':
-      return makeBadge({
+      return {
         label: 'server',
         message: data.status,
         color: data.status === 'online' ? 'brightgreen' : 'red',
-      });
+      };
 
     case 'players':
-      return makeBadge({
+      return {
         label: 'players',
         message: `${data.players}/${data.maxPlayers}`,
         color: 'blue',
-      });
+      };
 
     case 'tps':
-      return makeBadge({
+      return {
         label: 'tps',
         message: data.tps.toFixed(1),
         color: getColorForMetric('tps', data.tps),
-      });
+      };
 
     case 'software':
       if (data.software) {
-        return makeBadge({
+        return {
           label: 'software',
           message: data.software,
           color: 'blueviolet',
-        });
+        };
       }
-      return makeBadge({
+      return {
         label: 'software',
         message: 'unknown',
         color: 'lightgrey',
-      });
+      };
 
     case 'version':
-      return makeBadge({
+      return {
         label: 'version',
         message: data.version,
         color: 'informational',
-      });
+      };
 
     default:
-      return makeBadge({
+      return {
         label: 'server',
         message: data.status,
         color: 'brightgreen',
-      });
+      };
   }
 }
 
-function createOfflineBadge(corsHeaders: Record<string, string>): Response {
-  const badge = makeBadge({
+type BadgeStyle = 'flat' | 'flat-square' | 'plastic' | 'for-the-badge' | 'social';
+
+
+function createOfflineBadge(
+  corsHeaders: Record<string, string>,
+  options?: BadgeOptions
+): Response {
+  const badgeParams: Record<string, unknown> = {
     label: 'server',
     message: 'offline',
     color: 'red',
-  });
+  };
+
+  if (options?.label) {
+    badgeParams.label = decodeURIComponent(options.label);
+  }
+
+  if (options?.labelColor) {
+    badgeParams.labelColor = options.labelColor;
+  }
+
+  if (options?.color) {
+    badgeParams.color = options.color;
+  }
+
+  if (options?.style) {
+    badgeParams.style = options.style as BadgeStyle;
+  }
+
+  if (options?.logo) {
+    badgeParams.logo = options.logo;
+  }
+
+  if (options?.logoColor) {
+    badgeParams.logoColor = options.logoColor;
+  }
+
+  if (options?.logoSize) {
+    badgeParams.logoSize = options.logoSize;
+  }
+
+  if (options?.link) {
+    badgeParams.link = [decodeURIComponent(options.link)];
+  }
+
+  const badge = makeBadge(badgeParams);
 
   return new Response(badge, {
     headers: {
@@ -137,13 +248,36 @@ function createOfflineBadge(corsHeaders: Record<string, string>): Response {
 
 function createErrorBadge(
   message: string,
-  corsHeaders: Record<string, string>
+  corsHeaders: Record<string, string>,
+  options?: BadgeOptions
 ): Response {
-  const badge = makeBadge({
+  const badgeParams: Record<string, unknown> = {
     label: 'error',
     message,
     color: 'critical',
-  });
+  };
+
+  if (options?.style) {
+    badgeParams.style = options.style as BadgeStyle;
+  }
+
+  if (options?.logo) {
+    badgeParams.logo = options.logo;
+  }
+
+  if (options?.logoColor) {
+    badgeParams.logoColor = options.logoColor;
+  }
+
+  if (options?.logoSize) {
+    badgeParams.logoSize = options.logoSize;
+  }
+
+  if (options?.link) {
+    badgeParams.link = [decodeURIComponent(options.link)];
+  }
+
+  const badge = makeBadge(badgeParams);
 
   return new Response(badge, {
     status: 400,
@@ -188,5 +322,24 @@ function parseServerData(dataJson: string): ServerData {
     software,
     version,
     timestamp,
+  };
+}
+
+function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
+  const cacheSecondsParam = params.get('cacheSeconds');
+  const cacheSeconds = cacheSecondsParam
+    ? Math.max(0, Math.min(parseInt(cacheSecondsParam, 10), 86400))
+    : undefined;
+
+  return {
+    style: params.get('style') ?? undefined,
+    logo: params.get('logo') ?? undefined,
+    logoColor: params.get('logoColor') ?? undefined,
+    logoSize: params.get('logoSize') ?? undefined,
+    label: params.get('label') ?? undefined,
+    labelColor: params.get('labelColor') ?? undefined,
+    color: params.get('color') ?? undefined,
+    cacheSeconds: cacheSeconds ?? undefined,
+    link: params.get('link') ?? undefined,
   };
 }
