@@ -2,16 +2,18 @@ import { makeBadge } from 'badge-maker';
 import { getColorForMetric } from '../utils/colors';
 import { Env } from '../index';
 
+/** Describes server data stored in KV. */
 export interface ServerData {
   status: string;
   players: number;
-  max_players: number;
+  maxPlayers: number;
   tps: number;
   software?: string;
   version: string;
   timestamp: number;
 }
 
+/** Builds badge responses from KV-stored data. */
 export async function handleBadge(
   request: Request,
   env: Env,
@@ -39,7 +41,7 @@ export async function handleBadge(
   }
 
   try {
-    const data = JSON.parse(dataJson) as ServerData;
+    const data = parseServerData(dataJson);
 
     // Check if data is stale (older than 5 minutes)
     const age = Date.now() - data.timestamp;
@@ -76,7 +78,7 @@ function generateBadge(type: string, data: ServerData): string {
     case 'players':
       return makeBadge({
         label: 'players',
-        message: `${data.players}/${data.max_players}`,
+        message: `${data.players}/${data.maxPlayers}`,
         color: 'blue',
       });
 
@@ -139,7 +141,7 @@ function createErrorBadge(
 ): Response {
   const badge = makeBadge({
     label: 'error',
-    message: message,
+    message,
     color: 'critical',
   });
 
@@ -150,4 +152,41 @@ function createErrorBadge(
       'Content-Type': 'image/svg+xml',
     },
   });
+}
+
+function parseServerData(dataJson: string): ServerData {
+  const parsed = JSON.parse(dataJson) as Record<string, unknown>;
+
+  const status = parsed['status'];
+  const players = parsed['players'];
+  const maxPlayersValue = parsed['maxPlayers'] ?? parsed['max_players'];
+  const tps = parsed['tps'];
+  const software = parsed['software'];
+  const version = parsed['version'];
+  const timestamp = parsed['timestamp'];
+
+  if (
+    typeof status !== 'string' ||
+    typeof players !== 'number' ||
+    typeof maxPlayersValue !== 'number' ||
+    typeof tps !== 'number' ||
+    typeof version !== 'string' ||
+    typeof timestamp !== 'number'
+  ) {
+    throw new Error('Invalid server data format');
+  }
+
+  if (software !== undefined && typeof software !== 'string') {
+    throw new Error('Invalid server data format');
+  }
+
+  return {
+    status,
+    players,
+    maxPlayers: maxPlayersValue,
+    tps,
+    software,
+    version,
+    timestamp,
+  };
 }

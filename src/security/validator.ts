@@ -3,9 +3,7 @@ const MIN_LENGTH = 40;
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-/**
- * Validates that a secret token has the correct format
- */
+/** Validates that a secret token matches the expected format. */
 export function validateSecretToken(token: string): boolean {
   // Check null or empty
   if (!token || token.length === 0) {
@@ -27,9 +25,7 @@ export function validateSecretToken(token: string): boolean {
   return UUID_PATTERN.test(uuid);
 }
 
-/**
- * Validates that a public ID has the correct format
- */
+/** Validates that a public ID matches the expected format. */
 export function validatePublicId(publicId: string): boolean {
   if (!publicId || publicId.length === 0) {
     return false;

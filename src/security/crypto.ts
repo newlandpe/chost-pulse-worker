@@ -7,6 +7,7 @@ async function getWebCrypto(): Promise<Crypto> {
   throw new Error('Web Crypto API is not available');
 }
 
+/** Derives a public ID from a secret token. */
 export async function derivePublicId(secretToken: string): Promise<string> {
   // Remove prefix
   const cleanToken = secretToken.replace('sk_live_', '');
@@ -25,9 +26,7 @@ export async function derivePublicId(secretToken: string): Promise<string> {
   return 'srv_pub_' + hashHex.substring(0, 12);
 }
 
-/**
- * Hash a string using SHA-256
- */
+/** Hashes a string using SHA-256. */
 export async function sha256(text: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(text);

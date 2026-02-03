@@ -1,5 +1,3 @@
-/// <reference types="node" />
-
 import { webcrypto } from 'node:crypto';
 
 if (!globalThis.crypto) {

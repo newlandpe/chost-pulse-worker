@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { derivePublicId, sha256 } from '../src/security/crypto';
-import { validateSecretToken, validatePublicId } from '../src/security/validator';
+import { validatePublicId, validateSecretToken } from '../src/security/validator';
 import { getColorForMetric } from '../src/utils/colors';
 
 describe('Crypto Functions', () => {
@@ -9,7 +9,8 @@ describe('Crypto Functions', () => {
     const publicId = await derivePublicId(secretToken);
 
     expect(publicId).toMatch(/^srv_pub_[0-9a-f]{12}$/);
-    expect(publicId).toBe('srv_pub_' + (await sha256('550e8400-e29b-41d4-a716-446655440000')).substring(0, 12));
+    const expectedHash = await sha256('550e8400-e29b-41d4-a716-446655440000');
+    expect(publicId).toBe(`srv_pub_${expectedHash.substring(0, 12)}`);
   });
 
   it('should generate consistent public IDs', async () => {
@@ -35,7 +36,9 @@ describe('Token Validation', () => {
   it('should reject invalid secret token formats', () => {
     expect(validateSecretToken('invalid')).toBe(false);
     expect(validateSecretToken('sk_live_123')).toBe(false);
-    expect(validateSecretToken('srv_pub_550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+    expect(
+      validateSecretToken('srv_pub_550e8400-e29b-41d4-a716-446655440000')
+    ).toBe(false);
     expect(validateSecretToken('')).toBe(false);
   });
 
@@ -47,7 +50,9 @@ describe('Token Validation', () => {
   it('should reject invalid public ID formats', () => {
     expect(validatePublicId('invalid')).toBe(false);
     expect(validatePublicId('srv_pub_')).toBe(false);
-    expect(validatePublicId('sk_live_550e8400-e29b-41d4-a716-446655440000')).toBe(false);
+    expect(
+      validatePublicId('sk_live_550e8400-e29b-41d4-a716-446655440000')
+    ).toBe(false);
     expect(validatePublicId('')).toBe(false);
   });
 });

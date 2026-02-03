@@ -2,38 +2,44 @@ import { derivePublicId } from '../security/crypto';
 import { validateSecretToken } from '../security/validator';
 import { Env } from '../index';
 
+/** Describes the heartbeat request payload. */
 export interface HeartbeatRequest {
   token: string;
-  data: {
-    status: string;
-    players: number;
-    max_players: number;
-    tps: number;
-    software?: string;
-    version: string;
-  };
+  data: HeartbeatRequestData;
 }
 
+/** Describes the heartbeat payload data. */
+export interface HeartbeatRequestData {
+  status: string;
+  players: number;
+  maxPlayers: number;
+  tps: number;
+  software?: string;
+  version: string;
+}
+
+/** Describes server data stored in KV. */
 export interface ServerData {
   status: string;
   players: number;
-  max_players: number;
+  maxPlayers: number;
   tps: number;
   software?: string;
   version: string;
   timestamp: number;
 }
 
+/** Stores heartbeat data and returns the derived public ID. */
 export async function handleHeartbeat(
   request: Request,
   env: Env,
   corsHeaders: Record<string, string>
 ): Promise<Response> {
   try {
-    const body = (await request.json()) as HeartbeatRequest;
+    const body = parseHeartbeatRequest(await request.json());
 
     // Validate request body
-    if (!body.token || !body.data) {
+    if (!body) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: token and data' }),
         {
@@ -89,4 +95,52 @@ export async function handleHeartbeat(
       }
     );
   }
+}
+
+function parseHeartbeatRequest(body: unknown): HeartbeatRequest | null {
+  if (!body || typeof body !== 'object') {
+    return null;
+  }
+
+  const record = body as Record<string, unknown>;
+  const token = record['token'];
+  const data = record['data'];
+
+  if (typeof token !== 'string' || !data || typeof data !== 'object') {
+    return null;
+  }
+
+  const dataRecord = data as Record<string, unknown>;
+  const status = dataRecord['status'];
+  const players = dataRecord['players'];
+  const maxPlayersValue = dataRecord['maxPlayers'] ?? dataRecord['max_players'];
+  const tps = dataRecord['tps'];
+  const software = dataRecord['software'];
+  const version = dataRecord['version'];
+
+  if (
+    typeof status !== 'string' ||
+    typeof players !== 'number' ||
+    typeof maxPlayersValue !== 'number' ||
+    typeof tps !== 'number' ||
+    typeof version !== 'string'
+  ) {
+    return null;
+  }
+
+  if (software !== undefined && typeof software !== 'string') {
+    return null;
+  }
+
+  return {
+    token,
+    data: {
+      status,
+      players,
+      maxPlayers: maxPlayersValue,
+      tps,
+      software,
+      version,
+    },
+  };
 }

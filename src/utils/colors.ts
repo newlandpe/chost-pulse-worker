@@ -1,12 +1,16 @@
-/**
- * Gets a color for a metric badge based on its value
- */
+/** Returns the color for a metric badge based on its value. */
 export function getColorForMetric(metric: string, value: number): string {
   switch (metric) {
     case 'tps':
-      if (value >= 19.0) return 'brightgreen';
-      if (value >= 15.0) return 'yellow';
-      if (value >= 10.0) return 'orange';
+      if (value >= 19.0) {
+        return 'brightgreen';
+      }
+      if (value >= 15.0) {
+        return 'yellow';
+      }
+      if (value >= 10.0) {
+        return 'orange';
+      }
       return 'red';
 
     case 'players':
@@ -18,9 +22,7 @@ export function getColorForMetric(metric: string, value: number): string {
   }
 }
 
-/**
- * Color scheme definitions
- */
+/** Defines the standard color scheme. */
 export const colors = {
   online: 'brightgreen',
   offline: 'red',
