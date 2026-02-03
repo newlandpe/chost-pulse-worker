@@ -67,7 +67,7 @@ export async function handleBadge(
     }
 
     // Generate badge based on type
-    const badge = generateBadge(type, data, options);
+    const badge = await generateBadge(type, data, options);
 
     // Determine cache time
     const cacheSeconds = options.cacheSeconds ?? 60;
@@ -89,11 +89,11 @@ export async function handleBadge(
   }
 }
 
-function generateBadge(
+async function generateBadge(
   type: string,
   data: ServerData,
   options: BadgeOptions
-): string {
+): Promise<string> {
   const badgeParams = getDefaultBadgeParams(type, data);
 
   // Apply custom label if provided
@@ -115,16 +115,12 @@ function generateBadge(
     badgeParams.style = options.style as BadgeStyle;
   }
 
+  // Fetch and apply simple-icons logo if provided
   if (options.logo) {
-    badgeParams.logo = options.logo;
-  }
-
-  if (options.logoColor) {
-    badgeParams.logoColor = options.logoColor;
-  }
-
-  if (options.logoSize) {
-    badgeParams.logoSize = options.logoSize;
+    const logoBase64 = await fetchLogoBase64(options.logo, options.logoColor);
+    if (logoBase64) {
+      badgeParams.logoBase64 = logoBase64;
+    }
   }
 
   if (options.link) {
@@ -219,18 +215,6 @@ function createOfflineBadge(
     badgeParams.style = options.style as BadgeStyle;
   }
 
-  if (options?.logo) {
-    badgeParams.logo = options.logo;
-  }
-
-  if (options?.logoColor) {
-    badgeParams.logoColor = options.logoColor;
-  }
-
-  if (options?.logoSize) {
-    badgeParams.logoSize = options.logoSize;
-  }
-
   if (options?.link) {
     badgeParams.link = [decodeURIComponent(options.link)];
   }
@@ -269,14 +253,6 @@ function createErrorBadge(
 
   if (options?.logo) {
     badgeParams.logo = options.logo;
-  }
-
-  if (options?.logoColor) {
-    badgeParams.logoColor = options.logoColor;
-  }
-
-  if (options?.logoSize) {
-    badgeParams.logoSize = options.logoSize;
   }
 
   if (options?.link) {
@@ -360,4 +336,29 @@ function parseBadgeOptions(params: URLSearchParams): BadgeOptions {
     cacheSeconds,
     link: params.get('link') ?? undefined,
   };
+}
+
+/** Fetch SVG logo from simple-icons CDN and convert to base64 */
+async function fetchLogoBase64(slug: string, color?: string): Promise<string | undefined> {
+  try {
+    const url = `https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${slug}.svg`;
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      return undefined;
+    }
+    
+    let svgContent = await response.text();
+    
+    // Apply custom color to SVG if provided
+    if (color) {
+      svgContent = svgContent.replace(/fill="#[0-9a-f]{6}"/gi, `fill="${color}"`);
+    }
+    
+    // Convert SVG to base64
+    const base64 = Buffer.from(svgContent).toString('base64');
+    return `data:image/svg+xml;base64,${base64}`;
+  } catch (error) {
+    return undefined;
+  }
 }
