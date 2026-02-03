@@ -81,6 +81,8 @@ npm run deploy:dev
 npm run deploy:prod
 ```
 
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/newlandpe/chost-pulse-worker)
+
 ## API Endpoints
 
 ### POST /api/heartbeat
