@@ -57,7 +57,7 @@ preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID_HERE"
 
 [env.production]
 name = "chost-pulse-worker"
-route = "[your-domain.com/](https://your-domain.com/)*"  # Replace with your domain
+route = "https://your-domain.com/*"  # Replace with your domain
 
 [[env.production.kv_namespaces]]
 binding = "PULSE_KV"
