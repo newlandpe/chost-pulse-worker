@@ -1,6 +1,6 @@
-# ChostPulse - Cloudflare Worker
+# ChostPulse
 
-ChostPulse Worker is a serverless backend built on Cloudflare Workers for real-time game server monitoring and SVG badge generation. It leverages KV storage and SHA-256 encryption to provide a secure, distributed telemetry system with minimal latency.
+ChostPulse is a serverless backend for real-time game server monitoring and SVG badge generation. Supports Cloudflare Workers, Vercel, and Netlify with distributed storage and SHA-256 encryption.
 
 ## Features
 
