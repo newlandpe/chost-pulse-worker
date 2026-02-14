@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build:netlify"
+  publish = "dist"
+  functions = "api"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/api/:splat"
+  status = 200

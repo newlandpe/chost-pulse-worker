@@ -1,5 +1,5 @@
 name = "chost-pulse-worker"
-main = "src/index.ts"
+main = "src/entry/cloudflare.ts"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
