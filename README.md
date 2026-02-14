@@ -133,6 +133,10 @@ Or connect your GitHub repository to Vercel for automatic deployments:
 3. Add environment variables during import
 4. Deploy
 
+**One-Click Deploy:**
+
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/newlandpe/chost-pulse-worker)
+
 ---
 
 ### Option C: Netlify
@@ -168,6 +172,10 @@ Netlify Blobs are configured automatically - no additional setup required.
 3. Click "Add new site" → "Import an existing project"
 4. Select your repository
 5. Deploy
+
+**One-Click Deploy:**
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/newlandpe/chost-pulse-worker)
 
 ---
 
