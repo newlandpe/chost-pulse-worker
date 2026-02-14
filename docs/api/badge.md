@@ -226,20 +226,20 @@ All color parameters accept:
 ## Best Practices
 
 1. **Cache Appropriately**
-   - Short cache (60s) for active monitoring
-   - Longer cache (5-10 min) for dashboard displays
-   - No cache (0s) for real-time status pages
+    - Short cache (60s) for active monitoring
+    - Longer cache (5-10 min) for dashboard displays
+    - No cache (0s) for real-time status pages
 
 2. **Icon Selection**
-   - Use relevant icons from [simple-icons](https://simpleicons.org)
-   - Test icon sizing with `logoSize=auto` for complex logos
+    - Use relevant icons from [simple-icons](https://simpleicons.org)
+    - Test icon sizing with `logoSize=auto` for complex logos
 
 3. **URL Encoding**
-   - Always URL-encode special characters and spaces
-   - Use `%20` for spaces in labels
-   - Use `%3A`, `%2F` for URL components in `link` parameter
+    - Always URL-encode special characters and spaces
+    - Use `%20` for spaces in labels
+    - Use `%3A`, `%2F` for URL components in `link` parameter
 
 4. **Responsive Design**
-   - Badge width varies based on text length
-   - Plan layout accounting for dynamic width
-   - Use fixed containers for predictable layouts
+    - Badge width varies based on text length
+    - Plan layout accounting for dynamic width
+    - Use fixed containers for predictable layouts
