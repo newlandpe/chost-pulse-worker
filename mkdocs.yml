@@ -52,6 +52,7 @@ nav:
     - Badge: api/badge.md
     - Health: api/health.md
   - Deployment: deployment.md
+  - Plugins: plugins.md
   - Security: security.md
 
 markdown_extensions:
