@@ -1,32 +1,54 @@
-# Chost Pulse Worker
+# ChostPulse
 
-Cloudflare Worker for ChostPulse monitoring system that records server heartbeats and renders status badges.
+Serverless backend for real-time game server monitoring and SVG badge generation. Supports Cloudflare Workers, Vercel, and Netlify.
 
 ## Features
 
 - **Heartbeat ingestion** with format validation
 - **Public ID derivation** via SHA-256 hashing
 - **Badge rendering** for status, players, TPS, software, and version
-- **KV storage** with automatic expiration (5 minutes TTL)
+- **Distributed storage** with automatic expiration (5 minutes TTL)
 - **CORS support** for cross-origin requests
+- **Multi-platform**: Cloudflare Workers, Vercel, Netlify
 
 ## Quick Start
 
-### 1. Deploy the Worker
+Choose your platform:
 
-Deploy to Cloudflare using Wrangler:
+### Cloudflare Workers (Recommended)
 
 ```bash
 npm install
-wrangler deploy
+npx wrangler login
+npx wrangler kv:namespace create PULSE_KV
+npx wrangler kv:namespace create PULSE_KV --preview
+# Configure wrangler.toml with KV IDs
+npm run deploy:prod
 ```
 
-### 2. Send a Heartbeat
-
-Send server status to the worker:
+### Vercel
 
 ```bash
-curl -X POST https://your-worker.workers.dev/api/heartbeat \
+npm install
+# Create KV store in Vercel Dashboard
+# Set KV_REST_API_URL and KV_REST_API_TOKEN env vars
+npm run build:vercel
+vercel deploy --prod
+```
+
+### Netlify
+
+```bash
+npm install
+npm install -g netlify-cli
+netlify init
+netlify deploy --prod
+```
+
+### Send a Heartbeat
+
+```bash
+curl -X POST https://your-domain.com/api/heartbeat \
   -H "Content-Type: application/json" \
   -d '{
     "token": "sk_live_550e8400-e29b-41d4-a716-446655440000",
@@ -51,12 +73,10 @@ Response:
 }
 ```
 
-### 3. Use the Badge
-
-Display the badge using the returned public ID:
+### Use the Badge
 
 ```markdown
-![Server Status](https://your-worker.workers.dev/api/badge?id=srv_pub_a1b2c3d4e5f6&type=status)
+![Server Status](https://your-domain.com/api/badge?id=srv_pub_a1b2c3d4e5f6&type=status)
 ```
 
 ## Available Endpoints
@@ -77,7 +97,7 @@ Display the badge using the returned public ID:
 
 The worker uses:
 
-- **Cloudflare KV** for storing heartbeat data
+- **Storage**: Cloudflare KV / Vercel KV / Netlify Blobs
 - **Web Crypto API** for SHA-256 hashing
 - **badge-maker** library for SVG badge generation
 - **TypeScript** for type safety
@@ -85,5 +105,4 @@ The worker uses:
 ## Requirements
 
 - Node.js 20+
-- Cloudflare account
-- Wrangler CLI
+- Account on chosen platform (Cloudflare, Vercel, or Netlify)
