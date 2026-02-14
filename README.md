@@ -267,22 +267,22 @@ Health check endpoint.
 .
 +-- src/
 |   +-- entry/
-|   |   +-- cloudflare.ts       # Cloudflare Workers entry point
-|   |   +-- vercel.ts           # Vercel entry point
-|   |   +-- netlify.ts          # Netlify entry point
+|   |   +-- cloudflare.ts      # Cloudflare Workers entry point
+|   |   +-- vercel.ts          # Vercel entry point
+|   |   +-- netlify.ts         # Netlify entry point
 |   +-- handlers/
-|   |   +-- heartbeat.ts        # POST /api/heartbeat handler
-|   |   +-- badge.ts            # GET /api/badge handler
+|   |   +-- heartbeat.ts       # POST /api/heartbeat handler
+|   |   +-- badge.ts           # GET /api/badge handler
 |   +-- storage/
-|   |   +-- index.ts            # Storage interface
+|   |   +-- index.ts           # Storage interface
 |   |   +-- cloudflare-kv.ts   # Cloudflare KV adapter
 |   |   +-- vercel-kv.ts       # Vercel KV adapter
 |   |   +-- netlify-blobs.ts   # Netlify Blobs adapter
 |   +-- security/
-|   |   +-- crypto.ts           # SHA-256 hashing utilities
+|   |   +-- crypto.ts          # SHA-256 hashing utilities
 |   |   +-- validator.ts       # Token validation
 |   +-- utils/
-|       +-- colors.ts           # Badge color schemes
+|       +-- colors.ts          # Badge color schemes
 +-- test/
 |   +-- worker.test.ts         # Unit tests
 +-- package.json
