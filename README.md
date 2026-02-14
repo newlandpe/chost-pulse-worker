@@ -83,6 +83,35 @@ npm run deploy:prod
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/newlandpe/chost-pulse-worker)
 
+### Deploy to Vercel
+
+1. Create a Vercel KV store:
+   - Go to [Vercel Storage](https://vercel.com/dashboard/stores)
+   - Create a new KV store
+   - Copy the `KV_REST_API_URL` and `KV_REST_API_TOKEN`
+
+2. Set environment variables in Vercel:
+   - `KV_REST_API_URL` - your KV store URL
+   - `KV_REST_API_TOKEN` - your KV store token
+
+3. Deploy:
+
+```bash
+npm run build:vercel
+vercel deploy --prod
+```
+
+### Deploy to Netlify
+
+1. Deploy:
+
+```bash
+npm install -g netlify-cli
+netlify deploy --prod
+```
+
+Netlify Blobs are configured automatically.
+
 ## API Endpoints
 
 ### POST /api/heartbeat
