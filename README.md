@@ -16,37 +16,42 @@ ChostPulse is a serverless backend for real-time game server monitoring and SVG 
 
 - Node.js (v20 or higher recommended)
 - npm or yarn package manager
-- Cloudflare account
-- Wrangler CLI
+- Account on your chosen platform (Cloudflare, Vercel, or Netlify)
 
 ## Quick Start
 
-### 1. Install Dependencies
+Choose your deployment platform:
+
+### Option A: Cloudflare Workers (Recommended)
+
+**1. Install Dependencies**
 
 ```bash
 npm install
 ```
 
-### 2. Login to Cloudflare
+**2. Install and Login to Wrangler**
 
 ```bash
+npm install -g wrangler
 npx wrangler login
 ```
 
-### 3. Create KV Namespaces
+**3. Create KV Namespaces**
 
 ```bash
 # Create production KV namespace
 npx wrangler kv:namespace create PULSE_KV
-# Create preview KV namespace
+
+# Create preview KV namespace for testing
 npx wrangler kv:namespace create PULSE_KV --preview
 ```
 
-The command will output namespace IDs. Copy them for the next step.
+Copy the namespace IDs from the output.
 
-### 4. Configure wrangler.toml
+**4. Configure wrangler.toml**
 
-Update `wrangler.toml` with your KV namespace IDs and domain:
+Update `wrangler.toml` with your KV namespace IDs:
 
 ```toml
 # Global KV binding for local and preview
@@ -64,53 +69,117 @@ binding = "PULSE_KV"
 id = "YOUR_PRODUCTION_KV_NAMESPACE_ID_HERE"
 ```
 
-### 5. Local Development
+**5. Local Development**
 
 ```bash
-# Start development server
 npm run dev
 # Access at http://localhost:8787
 ```
 
-### 6. Deploy
+**6. Deploy**
 
 ```bash
-# Deploy to development environment
-npm run deploy:dev
 # Deploy to production
 npm run deploy:prod
+
+# Or deploy to development environment
+npm run deploy:dev
 ```
+
+**One-Click Deploy:**
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/newlandpe/chost-pulse-worker)
 
-### Deploy to Vercel
+---
 
-1. Create a Vercel KV store:
-   - Go to [Vercel Storage](https://vercel.com/dashboard/stores)
-   - Create a new KV store
-   - Copy the `KV_REST_API_URL` and `KV_REST_API_TOKEN`
+### Option B: Vercel
 
-2. Set environment variables in Vercel:
-   - `KV_REST_API_URL` - your KV store URL
-   - `KV_REST_API_TOKEN` - your KV store token
-
-3. Deploy:
+**1. Install Dependencies**
 
 ```bash
+npm install
+```
+
+**2. Create Vercel KV Store**
+
+- Go to [Vercel Storage Dashboard](https://vercel.com/dashboard/stores)
+- Click "Create Database" → Select "KV"
+- Name your store (e.g., "chost-pulse-kv")
+- Copy the connection credentials:
+  - `KV_REST_API_URL`
+  - `KV_REST_API_TOKEN`
+
+**3. Configure Environment Variables**
+
+Set the following environment variables in your Vercel project settings:
+
+- `KV_REST_API_URL` - Your KV store REST API URL
+- `KV_REST_API_TOKEN` - Your KV store authentication token
+
+**4. Deploy**
+
+Using Vercel CLI:
+
+```bash
+npm install -g vercel
 npm run build:vercel
 vercel deploy --prod
 ```
 
-### Deploy to Netlify
+Or connect your GitHub repository to Vercel for automatic deployments:
 
-1. Deploy:
+1. Push your code to GitHub
+2. Import the repository in [Vercel Dashboard](https://vercel.com/new)
+3. Add environment variables during import
+4. Deploy
+
+---
+
+### Option C: Netlify
+
+**1. Install Dependencies**
 
 ```bash
+npm install
 npm install -g netlify-cli
+```
+
+**2. Initialize Netlify**
+
+```bash
+netlify login
+netlify init
+```
+
+Follow the prompts to connect your repository and configure the site.
+
+**3. Deploy**
+
+```bash
 netlify deploy --prod
 ```
 
-Netlify Blobs are configured automatically.
+Netlify Blobs are configured automatically - no additional setup required.
+
+**Or use Netlify UI:**
+
+1. Push your code to GitHub
+2. Go to [Netlify Dashboard](https://app.netlify.com)
+3. Click "Add new site" → "Import an existing project"
+4. Select your repository
+5. Deploy
+
+---
+
+## Platform Comparison
+
+| Feature | Cloudflare Workers | Vercel | Netlify |
+|---------|-------------------|--------|---------|
+| **Edge Locations** | 300+ | 100+ | 100+ |
+| **Cold Start** | <1ms | ~50ms | ~50ms |
+| **Storage** | Cloudflare KV | Vercel KV | Netlify Blobs |
+| **Free Tier Requests** | 100k/day | 100k/month | 125k/month |
+| **Best For** | High traffic, lowest latency | Easy integration with Next.js | Simple deployment, JAMstack |
 
 ## API Endpoints
 
@@ -197,20 +266,30 @@ Health check endpoint.
 ```
 .
 +-- src/
-|   +-- index.ts              # Main entry point & routing
+|   +-- entry/
+|   |   +-- cloudflare.ts       # Cloudflare Workers entry point
+|   |   +-- vercel.ts           # Vercel entry point
+|   |   +-- netlify.ts          # Netlify entry point
 |   +-- handlers/
-|   |   +-- heartbeat.ts      # POST /api/heartbeat handler
-|   |   \-- badge.ts          # GET /api/badge handler
+|   |   +-- heartbeat.ts        # POST /api/heartbeat handler
+|   |   +-- badge.ts            # GET /api/badge handler
+|   +-- storage/
+|   |   +-- index.ts            # Storage interface
+|   |   +-- cloudflare-kv.ts   # Cloudflare KV adapter
+|   |   +-- vercel-kv.ts       # Vercel KV adapter
+|   |   +-- netlify-blobs.ts   # Netlify Blobs adapter
 |   +-- security/
-|   |   +-- crypto.ts         # SHA-256 hashing utilities
-|   |   \-- validator.ts      # Token validation
-|   \-- utils/
-|       \-- colors.ts         # Badge color schemes
+|   |   +-- crypto.ts           # SHA-256 hashing utilities
+|   |   +-- validator.ts       # Token validation
+|   +-- utils/
+|       +-- colors.ts           # Badge color schemes
 +-- test/
-|   \-- worker.test.ts        # Unit tests
+|   +-- worker.test.ts         # Unit tests
 +-- package.json
 +-- tsconfig.json
-+-- wrangler.toml             # Cloudflare Worker configuration
++-- wrangler.toml              # Cloudflare Worker configuration
++-- vercel.json                # Vercel configuration
++-- netlify.toml               # Netlify configuration
 \-- README.md
 ```
 
