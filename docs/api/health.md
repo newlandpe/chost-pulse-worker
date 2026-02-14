@@ -47,7 +47,7 @@ Access-Control-Allow-Origin: *
 ## Example
 
 ```bash
-curl https://your-worker.workers.dev/health
+curl https://your-domain.com/health
 ```
 
 Response:

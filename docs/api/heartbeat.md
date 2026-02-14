@@ -155,7 +155,7 @@ Example: If a server sends heartbeats every 30 seconds, offline detection trigge
 ## Example
 
 ```bash
-curl -X POST https://your-worker.workers.dev/api/heartbeat \
+curl -X POST https://your-domain.com/api/heartbeat \
   -H "Content-Type: application/json" \
   -d '{
     "token": "sk_live_550e8400-e29b-41d4-a716-446655440000",

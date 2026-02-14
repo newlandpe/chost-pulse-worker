@@ -141,14 +141,14 @@ GET /api/badge?id=srv_pub_a1b2c3d4e5f6&type=status&label=Game%20Server&link=http
 Include in README with markdown syntax:
 
 ```markdown
-[![Status](https://your-worker-url/api/badge?id=srv_pub_a1b2c3d4e5f6&type=status)](https://play.example.com)
+[![Status](https://your-domain.com/api/badge?id=srv_pub_a1b2c3d4e5f6&type=status)](https://play.example.com)
 ```
 
 With HTML for more control:
 
 ```html
 <img alt="Server Status" 
-     src="https://your-worker-url/api/badge?id=srv_pub_a1b2c3d4e5f6&type=status&style=flat-square&logo=gamepad&logoColor=white"
+     src="https://your-domain.com/api/badge?id=srv_pub_a1b2c3d4e5f6&type=status&style=flat-square&logo=gamepad&logoColor=white"
      width="180" />
 ```
 
