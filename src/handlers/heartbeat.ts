@@ -1,6 +1,6 @@
 import { derivePublicId } from '../security/crypto';
 import { validateSecretToken } from '../security/validator';
-import { Env } from '../index';
+import type { Storage } from '../storage';
 
 /** Describes the heartbeat request payload. */
 export interface HeartbeatRequest {
@@ -32,7 +32,7 @@ export interface ServerData {
 /** Stores heartbeat data and returns the derived public ID. */
 export async function handleHeartbeat(
   request: Request,
-  env: Env,
+  storage: Storage,
   corsHeaders: Record<string, string>
 ): Promise<Response> {
   try {
@@ -70,9 +70,7 @@ export async function handleHeartbeat(
     };
 
     // Store in KV with 5-minute TTL (expiration)
-    await env.PULSE_KV.put(publicId, JSON.stringify(serverData), {
-      expirationTtl: 300, // 5 minutes
-    });
+    await storage.put(publicId, JSON.stringify(serverData), 300);
 
     return new Response(
       JSON.stringify({
