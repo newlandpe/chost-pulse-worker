@@ -64,6 +64,7 @@ npm install
     ### 2. Configure Environment Variables
 
     Set in Vercel project settings:
+    
     - `KV_REST_API_URL` - Your KV store REST API URL
     - `KV_REST_API_TOKEN` - Your KV store authentication token
 
