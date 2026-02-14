@@ -1,6 +1,6 @@
 # Security
 
-Security considerations for Chost Pulse Worker.
+Security considerations for ChostPulse.
 
 ## Token Security
 
@@ -23,12 +23,10 @@ Public IDs are derived from secret tokens via SHA-256:
 
 ### Derivation Process
 
-```typescript
-1. Strip prefix: "sk_live_550e8400-..." → "550e8400-..."
-2. SHA-256 hash: "550e8400-..." → "a1b2c3d4e5f6..."
-3. Take first 12 chars: "a1b2c3d4e5f6"
-4. Add prefix: "srv_pub_a1b2c3d4e5f6"
-```
+1. Strip prefix: `sk_live_550e8400-...` → `550e8400-...`
+2. SHA-256 hash: `550e8400-...` → `a1b2c3d4e5f6...`
+3. Take first 12 chars: `a1b2c3d4e5f6`
+4. Add prefix: `srv_pub_a1b2c3d4e5f6`
 
 ## Data Validation
 
@@ -72,7 +70,7 @@ The worker uses a permissive CORS policy:
 
 ### Storage
 
-- Data stored in Cloudflare KV with 5-minute TTL
+- Data stored in KV store with 5-minute TTL
 - No personally identifiable information (PII) is collected
 - IP addresses are not logged or stored
 - Only server status metrics are stored
@@ -147,7 +145,7 @@ All communication uses HTTPS:
 
 ### At Rest
 
-Data in Cloudflare KV:
+Data in KV store:
 
 - Encrypted at rest by Cloudflare
 - No additional encryption needed

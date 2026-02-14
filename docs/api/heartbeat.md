@@ -1,6 +1,6 @@
 # Heartbeat API
 
-The heartbeat endpoint accepts server status updates and stores them in Cloudflare KV.
+The heartbeat endpoint accepts server status updates and stores them in KV.
 
 ## Endpoint
 
@@ -131,7 +131,7 @@ Result: `srv_pub_a1b2c3d4e5f6`
 
 ## Storage
 
-Data is stored in Cloudflare KV with:
+Data is stored in KV with:
 
 - **Key**: Public ID (e.g., `srv_pub_a1b2c3d4e5f6`)
 - **Value**: JSON object with server data + timestamp + heartbeatIntervalSec
