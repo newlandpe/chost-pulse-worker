@@ -17,77 +17,79 @@ cd chost-pulse-worker
 npm install
 ```
 
-## Cloudflare Workers
+## Deploy
 
-### 1. Create KV Namespace
+=== "Cloudflare Workers"
 
-```bash
-wrangler kv:namespace create PULSE_KV
-```
+    ### 1. Create KV Namespace
 
-Note the returned ID.
+    ```bash
+    wrangler kv:namespace create PULSE_KV
+    ```
 
-### 2. Configure wrangler.toml
+    Note the returned ID.
 
-Update `wrangler.toml` with your KV namespace ID:
+    ### 2. Configure wrangler.toml
 
-```toml
-name = "chost-pulse-worker"
-main = "src/entry/cloudflare.ts"
-compatibility_date = "2024-01-01"
+    Update `wrangler.toml` with your KV namespace ID:
 
-[[kv_namespaces]]
-binding = "PULSE_KV"
-id = "your-kv-namespace-id"
-```
+    ```toml
+    name = "chost-pulse-worker"
+    main = "src/entry/cloudflare.ts"
+    compatibility_date = "2024-01-01"
 
-### 3. Deploy
+    [[kv_namespaces]]
+    binding = "PULSE_KV"
+    id = "your-kv-namespace-id"
+    ```
 
-```bash
-# Development
-npm run deploy:dev
+    ### 3. Deploy
 
-# Production
-npm run deploy:prod
-```
+    ```bash
+    # Development
+    npm run deploy:dev
 
-## Vercel
+    # Production
+    npm run deploy:prod
+    ```
 
-### 1. Create Vercel KV Store
+=== "Vercel"
 
-- Go to [Vercel Storage Dashboard](https://vercel.com/dashboard/stores)
-- Create a new KV store
-- Copy `KV_REST_API_URL` and `KV_REST_API_TOKEN`
+    ### 1. Create Vercel KV Store
 
-### 2. Configure Environment Variables
+    - Go to [Vercel Storage Dashboard](https://vercel.com/dashboard/stores)
+    - Create a new KV store
+    - Copy `KV_REST_API_URL` and `KV_REST_API_TOKEN`
 
-Set in Vercel project settings:
-- `KV_REST_API_URL` - Your KV store REST API URL
-- `KV_REST_API_TOKEN` - Your KV store authentication token
+    ### 2. Configure Environment Variables
 
-### 3. Deploy
+    Set in Vercel project settings:
+    - `KV_REST_API_URL` - Your KV store REST API URL
+    - `KV_REST_API_TOKEN` - Your KV store authentication token
 
-```bash
-npm run build:vercel
-vercel deploy --prod
-```
+    ### 3. Deploy
 
-## Netlify
+    ```bash
+    npm run build:vercel
+    vercel deploy --prod
+    ```
 
-### 1. Initialize
+=== "Netlify"
 
-```bash
-netlify login
-netlify init
-```
+    ### 1. Initialize
 
-### 2. Deploy
+    ```bash
+    netlify login
+    netlify init
+    ```
 
-```bash
-netlify deploy --prod
-```
+    ### 2. Deploy
 
-Netlify Blobs are configured automatically.
+    ```bash
+    netlify deploy --prod
+    ```
+
+    Netlify Blobs are configured automatically.
 
 ## Verification
 

@@ -15,35 +15,35 @@ Serverless backend for real-time game server monitoring and SVG badge generation
 
 Choose your platform:
 
-### Cloudflare Workers (Recommended)
+=== "Cloudflare Workers"
 
-```bash
-npm install
-npx wrangler login
-npx wrangler kv:namespace create PULSE_KV
-npx wrangler kv:namespace create PULSE_KV --preview
-# Configure wrangler.toml with KV IDs
-npm run deploy:prod
-```
+    ```bash
+    npm install
+    npx wrangler login
+    npx wrangler kv:namespace create PULSE_KV
+    npx wrangler kv:namespace create PULSE_KV --preview
+    # Configure wrangler.toml with KV IDs
+    npm run deploy:prod
+    ```
 
-### Vercel
+=== "Vercel"
 
-```bash
-npm install
-# Create KV store in Vercel Dashboard
-# Set KV_REST_API_URL and KV_REST_API_TOKEN env vars
-npm run build:vercel
-vercel deploy --prod
-```
+    ```bash
+    npm install
+    # Create KV store in Vercel Dashboard
+    # Set KV_REST_API_URL and KV_REST_API_TOKEN env vars
+    npm run build:vercel
+    vercel deploy --prod
+    ```
 
-### Netlify
+=== "Netlify"
 
-```bash
-npm install
-npm install -g netlify-cli
-netlify init
-netlify deploy --prod
-```
+    ```bash
+    npm install
+    npm install -g netlify-cli
+    netlify init
+    netlify deploy --prod
+    ```
 
 ### Send a Heartbeat
 
