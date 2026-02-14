@@ -24,6 +24,7 @@ theme:
     - content.tooltips
     - content.action.edit
     - content.action.view
+    - content.tabs.link
   palette:
     - media: "(prefers-color-scheme)"
       toggle:
