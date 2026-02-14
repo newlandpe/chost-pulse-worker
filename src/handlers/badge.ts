@@ -1,6 +1,6 @@
 import { makeBadge, Format } from 'badge-maker';
 import { getColorForMetric } from '../utils/colors';
-import { Env } from '../index';
+import type { Storage } from '../storage';
 import * as simpleIcons from 'simple-icons';
 
 /** Describes server data stored in KV. */
@@ -244,7 +244,7 @@ class BadgeGenerator {
 /** Builds badge responses from KV-stored data. */
 export async function handleBadge(
   request: Request,
-  env: Env,
+  storage: Storage,
   corsHeaders: Record<string, string>
 ): Promise<Response> {
   const url = new URL(request.url);
@@ -262,7 +262,7 @@ export async function handleBadge(
     return generator.generate(null, type, { ...options, label: 'Invalid ID' });
   }
 
-  const dataJson = await env.PULSE_KV.get(publicId);
+  const dataJson = await storage.get(publicId);
   const generator = new BadgeGenerator(corsHeaders);
   return generator.generate(dataJson, type, options);
 }
