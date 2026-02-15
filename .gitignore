@@ -37,3 +37,4 @@ coverage/
 # Cloudflare
 .cloudflare/
 worker-configuration.d.ts
+.env*.local

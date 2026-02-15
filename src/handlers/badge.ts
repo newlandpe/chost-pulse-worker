@@ -202,7 +202,7 @@ class BadgeGenerator {
   private async fetchLogoBase64(slug: string, color?: string): Promise<string | undefined> {
     try {
       const iconKey = `si${slug.charAt(0).toUpperCase()}${slug.slice(1).toLowerCase()}` as keyof typeof simpleIcons;
-      const icon = simpleIcons[iconKey];
+      const icon = (simpleIcons as any)[iconKey];
 
       if (!icon || typeof icon !== 'object' || !('path' in icon)) {
         return undefined;
