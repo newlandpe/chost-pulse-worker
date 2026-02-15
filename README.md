@@ -177,9 +177,11 @@ Netlify Blobs are configured automatically - no additional setup required.
 
 | Feature | Cloudflare Workers | Vercel | Netlify |
 |---------|-------------------|--------|---------|
+| **Edge Locations** | 300+ | 100+ | 100+ |
+| **Cold Start** | <1ms | ~50ms | ~50ms |
 | **Runtime** | Workerd (V8) | Node.js / Edge | Node.js |
 | **Storage** | Cloudflare KV | Redis (ioredis) | Netlify Blobs |
-| **Edge Cache** | Yes | Yes | Yes |
+| **Free Tier Requests** | 100k/day | 100k/month | 125k/month |
 | **Best For** | Global Low Latency | Next.js Ecosystem | Fast JAMstack |
 
 ## API Endpoints
