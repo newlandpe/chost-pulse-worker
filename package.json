@@ -13,7 +13,7 @@
     "build": "npm run build:cloudflare",
     "build:cloudflare": "tsc --project tsconfig.json",
     "build:vercel": "esbuild src/entry/vercel.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
-    "build:netlify": "esbuild src/entry/netlify.ts --bundle --format=esm --outfile=api/index.js --platform=neutral --external:@vercel/kv --external:@netlify/blobs",
+    "build:netlify": "esbuild src/entry/netlify.ts --bundle --format=esm --outfile=netlify/edge-functions/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "cf-typegen": "wrangler types"
