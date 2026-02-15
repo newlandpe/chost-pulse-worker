@@ -1,15 +1,13 @@
 {
   "name": "chost-pulse-worker",
   "version": "1.0.0",
-  "description": "Universal serverless worker for game server monitoring",
-  "main": "src/index.ts",
+  "description": "Multi-platform serverless worker for game server monitoring",
   "scripts": {
-    "dev:cf": "wrangler dev",
+    "dev:cf": "wrangler dev src/platforms/cloudflare.ts",
     "dev:vercel": "vercel dev",
     "dev:netlify": "netlify dev",
-    "build": "esbuild src/api/index.ts --bundle --format=esm --outfile=dist/index.js --platform=node --external:ioredis",
-    "build:vercel": "npm run build",
-    "build:netlify": "npm run build",
+    "build:vercel": "esbuild api/index.ts --bundle --format=esm --outfile=dist/index.js --platform=node --external:ioredis",
+    "build:cf": "tsc --project tsconfig.json",
     "test": "vitest run"
   },
   "dependencies": {
