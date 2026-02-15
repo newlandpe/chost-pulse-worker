@@ -6,7 +6,7 @@
   "scripts": {
     "dev:cf": "wrangler dev",
     "dev:vercel": "vercel dev",
-    "build:vercel": "esbuild src/api/vercel.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:ioredis",
+    "build:vercel": "esbuild src/api/vercel.ts --bundle --format=cjs --outfile=dist/index.js --platform=node --external:ioredis",
     "test": "vitest run"
   },
   "dependencies": {
