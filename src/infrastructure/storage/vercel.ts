@@ -1,27 +1,13 @@
 import { Storage } from '../../core/storage';
-import { Redis } from '@upstash/redis';
+import Redis from 'ioredis';
 
-export class VercelRedisStorage implements Storage {
+export class RedisStorage implements Storage {
   private redis: Redis;
-
-  constructor() {
-    this.redis = Redis.fromEnv();
+  constructor(url: string) { this.redis = new Redis(url); }
+  async get(key: string) { return await this.redis.get(key); }
+  async put(key: string, value: string, ttl?: number) {
+    if (ttl) await this.redis.set(key, value, 'EX', ttl);
+    else await this.redis.set(key, value);
   }
-
-  async get(key: string): Promise<string | null> {
-    const value = await this.redis.get(key);
-    return value ? String(value) : null;
-  }
-
-  async put(key: string, value: string, ttl?: number): Promise<void> {
-    if (ttl) {
-      await this.redis.set(key, value, { ex: ttl });
-    } else {
-      await this.redis.set(key, value);
-    }
-  }
-
-  async delete(key: string): Promise<void> {
-    await this.redis.del(key);
-  }
+  async delete(key: string) { await this.redis.del(key); }
 }

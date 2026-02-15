@@ -6,20 +6,13 @@ import { handleBadge } from './handlers/badge';
 import type { Storage } from './storage';
 
 export type AppEnv = {
-  Variables: {
-    storage: Storage;
-  };
+  Variables: { storage: Storage };
 };
 
 const app = new Hono<AppEnv>();
 
 app.use('*', logger());
-app.use('*', cors({
-  origin: '*',
-  allowMethods: ['GET', 'POST', 'OPTIONS'],
-  allowHeaders: ['Content-Type'],
-  maxAge: 86400,
-}));
+app.use('*', cors({ origin: '*', allowMethods: ['GET', 'POST', 'OPTIONS'] }));
 
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: Date.now() }));
 

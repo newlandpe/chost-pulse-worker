@@ -1,8 +1,5 @@
 {
-  "buildCommand": "npm run build:vercel",
-  "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/health", "destination": "/src/platforms/vercel.ts" },
-    { "source": "/api/(.*)", "destination": "/src/platforms/vercel.ts" }
+    { "source": "/(.*)", "destination": "/api/vercel" }
   ]
 }

@@ -5,21 +5,16 @@
   "main": "src/platforms/cloudflare.ts",
   "scripts": {
     "dev:cf": "wrangler dev",
-    "deploy:cf": "wrangler deploy",
     "dev:vercel": "vercel dev",
-    "dev:netlify": "netlify dev",
-    "build:vercel": "esbuild src/platforms/vercel.ts --bundle --format=esm --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:@upstash/redis",
-    "build:netlify": "esbuild src/platforms/netlify.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs",
+    "build:vercel": "esbuild src/api/vercel.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:ioredis",
     "test": "vitest run"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.9",
-    "@netlify/blobs": "^8.1.0",
-    "@upstash/redis": "^1.34.4",
-    "@vercel/kv": "^3.0.0",
     "badge-maker": "^5.0.2",
     "esbuild": "^0.24.0",
     "hono": "^4.11.9",
+    "ioredis": "^5.9.3",
     "simple-icons": "^16.7.0"
   },
   "devDependencies": {

@@ -1,13 +1,11 @@
-import { handle } from 'hono/vercel';
+import { handle } from '@hono/node-server/vercel';
 import { app } from '../core/app';
-import { VercelRedisStorage } from '../infrastructure/storage/vercel';
+import { RedisStorage } from '../infrastructure/storage/vercel';
 
-export const runtime = 'edge';
-
-app.use('*', async (c, next) => {
-  if (c.req.path.includes('/api/')) {
-    c.set('storage', new VercelRedisStorage());
-  }
+app.use('/api/*', async (c, next) => {
+  const url = process.env.REDIS_URL;
+  if (!url) return c.json({ error: 'REDIS_URL missing' }, 500);
+  c.set('storage', new RedisStorage(url));
   await next();
 });
 
