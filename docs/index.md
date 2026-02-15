@@ -21,19 +21,18 @@ Choose your platform:
     npm install
     npx wrangler login
     npx wrangler kv:namespace create PULSE_KV
-    npx wrangler kv:namespace create PULSE_KV --preview
     # Configure wrangler.toml with KV IDs
-    npm run deploy:prod
+    npx wrangler deploy
     ```
 
 === "Vercel"
 
     ```bash
     npm install
-    # Create KV store in Vercel Dashboard
-    # Set KV_REST_API_URL and KV_REST_API_TOKEN env vars
-    npm run build:vercel
-    vercel deploy --prod
+    # Link project: npx vercel link
+    # Set REDIS_URL env var
+    npm run build:bundle
+    npx vercel deploy --prod
     ```
 
 === "Netlify"

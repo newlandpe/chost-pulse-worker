@@ -72,18 +72,14 @@ id = "YOUR_PRODUCTION_KV_NAMESPACE_ID_HERE"
 **5. Local Development**
 
 ```bash
-npm run dev
+npm run dev:cf
 # Access at http://localhost:8787
 ```
 
 **6. Deploy**
 
 ```bash
-# Deploy to production
-npm run deploy:prod
-
-# Or deploy to development environment
-npm run deploy:dev
+npx wrangler deploy
 ```
 
 **One-Click Deploy:**
@@ -100,30 +96,22 @@ npm run deploy:dev
 npm install
 ```
 
-**2. Create Vercel KV Store**
+**2. Configure Environment**
 
-- Go to [Vercel Storage Dashboard](https://vercel.com/dashboard/stores)
-- Click "Create Database" → Select "KV"
-- Name your store (e.g., "chost-pulse-kv")
-- Copy the connection credentials:
-  - `KV_REST_API_URL`
-  - `KV_REST_API_TOKEN`
+- Link your project: `npx vercel link`
+- Pull variables: `npx vercel env pull .env.local`
+- Ensure `REDIS_URL` is set in `.env.local`.
 
-**3. Configure Environment Variables**
+**3. Local Development**
 
-Set the following environment variables in your Vercel project settings:
-
-- `KV_REST_API_URL` - Your KV store REST API URL
-- `KV_REST_API_TOKEN` - Your KV store authentication token
+```bash
+npm run dev:vercel
+```
 
 **4. Deploy**
 
-Using Vercel CLI:
-
 ```bash
-npm install -g vercel
-npm run build:vercel
-vercel deploy --prod
+npx vercel deploy --prod
 ```
 
 Or connect your GitHub repository to Vercel for automatic deployments:
@@ -157,7 +145,13 @@ netlify init
 
 Follow the prompts to connect your repository and configure the site.
 
-**3. Deploy**
+**3. Local Development**
+
+```bash
+npm run dev:netlify
+```
+
+**4. Deploy**
 
 ```bash
 netlify deploy --prod
@@ -183,11 +177,10 @@ Netlify Blobs are configured automatically - no additional setup required.
 
 | Feature | Cloudflare Workers | Vercel | Netlify |
 |---------|-------------------|--------|---------|
-| **Edge Locations** | 300+ | 100+ | 100+ |
-| **Cold Start** | <1ms | ~50ms | ~50ms |
-| **Storage** | Cloudflare KV | Vercel KV | Netlify Blobs |
-| **Free Tier Requests** | 100k/day | 100k/month | 125k/month |
-| **Best For** | High traffic, lowest latency | Easy integration with Next.js | Simple deployment, JAMstack |
+| **Runtime** | Workerd (V8) | Node.js / Edge | Node.js |
+| **Storage** | Cloudflare KV | Redis (ioredis) | Netlify Blobs |
+| **Edge Cache** | Yes | Yes | Yes |
+| **Best For** | Global Low Latency | Next.js Ecosystem | Fast JAMstack |
 
 ## API Endpoints
 
@@ -273,26 +266,30 @@ Health check endpoint.
 
 ```
 .
++-- api/
+|   \-- index.ts               # Vercel entry point (bridge)
 +-- src/
-|   +-- entry/
-|   |   +-- cloudflare.ts      # Cloudflare Workers entry point
-|   |   +-- vercel.ts          # Vercel entry point
-|   |   +-- netlify.ts         # Netlify entry point
-|   +-- handlers/
-|   |   +-- heartbeat.ts       # POST /api/heartbeat handler
-|   |   +-- badge.ts           # GET /api/badge handler
-|   +-- storage/
-|   |   +-- index.ts           # Storage interface
-|   |   +-- cloudflare-kv.ts   # Cloudflare KV adapter
-|   |   +-- vercel-kv.ts       # Vercel KV adapter
-|   |   +-- netlify-blobs.ts   # Netlify Blobs adapter
-|   +-- security/
-|   |   +-- crypto.ts          # SHA-256 hashing utilities
-|   |   +-- validator.ts       # Token validation
-|   +-- utils/
-|       +-- colors.ts          # Badge color schemes
+|   +-- core/                  # Universal business logic
+|   |   +-- handlers/
+|   |   |   +-- heartbeat.ts   # POST /api/heartbeat handler
+|   |   |   \-- badge.ts       # GET /api/badge handler
+|   |   +-- security/
+|   |   |   +-- crypto.ts      # SHA-256 hashing utilities
+|   |   |   \-- validator.ts   # Token validation
+|   |   +-- utils/
+|   |   |   \-- colors.ts      # Badge color schemes
+|   |   +-- storage.ts         # Storage interface
+|   |   \-- app.ts             # Core Hono application
+|   +-- infrastructure/        # Platform-specific implementations
+|   |   +-- storage/
+|   |   |   +-- cloudflare.ts  # Cloudflare KV adapter
+|   |   |   +-- vercel.ts      # Redis adapter (ioredis)
+|   |   |   \-- netlify.ts     # Netlify Blobs adapter
+|   \-- platforms/             # Runtime adapters
+|       +-- cloudflare.ts      # Cloudflare entry point
+|       \-- netlify.ts         # Netlify entry point
 +-- test/
-|   +-- worker.test.ts         # Unit tests
+|   \-- worker.test.ts         # Unit tests
 +-- package.json
 +-- tsconfig.json
 +-- wrangler.toml              # Cloudflare Worker configuration

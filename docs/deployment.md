@@ -35,8 +35,8 @@ npm install
 
     ```toml
     name = "chost-pulse-worker"
-    main = "src/entry/cloudflare.ts"
-    compatibility_date = "2024-01-01"
+    main = "src/platforms/cloudflare.ts"
+    compatibility_date = "2024-09-23"
 
     [[kv_namespaces]]
     binding = "PULSE_KV"
@@ -46,33 +46,27 @@ npm install
     ### 3. Deploy
 
     ```bash
-    # Development
-    npm run deploy:dev
-
-    # Production
-    npm run deploy:prod
+    npx wrangler deploy
     ```
 
 === "Vercel"
 
-    ### 1. Create Vercel KV Store
+    ### 1. Configure Redis (Upstash)
 
-    - Go to [Vercel Storage Dashboard](https://vercel.com/dashboard/stores)
-    - Create a new KV store
-    - Copy `KV_REST_API_URL` and `KV_REST_API_TOKEN`
+    - Create a Redis store in Vercel Storage or use Upstash directly.
+    - Copy the `REDIS_URL`.
 
     ### 2. Configure Environment Variables
 
     Set in Vercel project settings:
     
-    - `KV_REST_API_URL` - Your KV store REST API URL
-    - `KV_REST_API_TOKEN` - Your KV store authentication token
+    - `REDIS_URL` - Your Redis connection URL
 
     ### 3. Deploy
 
     ```bash
-    npm run build:vercel
-    vercel deploy --prod
+    npm run build:bundle
+    npx vercel deploy --prod
     ```
 
 === "Netlify"
