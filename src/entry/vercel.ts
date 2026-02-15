@@ -11,7 +11,6 @@ const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-// Singleton Redis client
 let redisClient: Redis | null = null;
 
 function getRedisClient() {
@@ -21,8 +20,7 @@ function getRedisClient() {
   return redisClient;
 }
 
-export default async function handler(req: any, res: any) {
-  // If Edge Runtime
+export const handler = async (req: any, res: any) => {
   if (typeof Request !== 'undefined' && req instanceof Request && !res) {
     return handleWebConnection(req);
   }
@@ -39,10 +37,20 @@ export default async function handler(req: any, res: any) {
       return;
     }
 
+    // Read body once for Node.js
+    let body: any = null;
+    if (req.method === 'POST') {
+      const chunks = [];
+      for await (const chunk of req) {
+        chunks.push(chunk);
+      }
+      body = Buffer.concat(chunks);
+    }
+
     const webReq = new Request(url.toString(), {
       method: req.method,
       headers: new Headers(req.headers as any),
-      body: req.method === 'POST' ? req : null,
+      body: body,
       // @ts-ignore
       duplex: 'half'
     });
@@ -57,12 +65,11 @@ export default async function handler(req: any, res: any) {
   } catch (error: any) {
     if (res && res.end) {
       res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify({ error: 'Internal Server Error', message: error.message }));
-    } else {
-      return new Response(error.message, { status: 500 });
     }
   }
-}
+};
 
 async function handleWebConnection(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -74,7 +81,7 @@ async function handleWebConnection(request: Request): Promise<Response> {
     });
   }
 
-  if (url.pathname === '/health' && request.method === 'GET') {
+  if (url.pathname === '/health' || url.pathname.endsWith('/health')) {
     return new Response(
       JSON.stringify({ status: 'ok', timestamp: Date.now() }),
       {
@@ -86,7 +93,7 @@ async function handleWebConnection(request: Request): Promise<Response> {
 
   const client = getRedisClient();
 
-  if (url.pathname.startsWith('/api/')) {
+  if (url.pathname.includes('/api/')) {
     if (!client) {
       return new Response(JSON.stringify({ error: 'Redis configuration missing' }), {
         status: 500,
@@ -96,11 +103,11 @@ async function handleWebConnection(request: Request): Promise<Response> {
 
     const storage = new VercelKVStorage(client);
 
-    if (url.pathname === '/api/heartbeat' && request.method === 'POST') {
+    if ((url.pathname === '/api/heartbeat' || url.pathname.endsWith('/api/heartbeat')) && request.method === 'POST') {
       return handleHeartbeat(request, storage, CORS_HEADERS);
     }
 
-    if (url.pathname === '/api/badge' && request.method === 'GET') {
+    if ((url.pathname === '/api/badge' || url.pathname.endsWith('/api/badge')) && request.method === 'GET') {
       return handleBadge(request, storage, CORS_HEADERS);
     }
   }
@@ -110,3 +117,5 @@ async function handleWebConnection(request: Request): Promise<Response> {
     headers: CORS_HEADERS,
   });
 }
+
+export default handler;
