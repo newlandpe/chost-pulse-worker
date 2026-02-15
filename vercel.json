@@ -1,7 +1,5 @@
 {
   "rewrites": [
-    { "source": "/health", "destination": "/api/vercel" },
-    { "source": "/api/:path*", "destination": "/api/vercel" }
-  ],
-  "outputDirectory": "dist"
+    { "source": "/(.*)", "destination": "/api" }
+  ]
 }

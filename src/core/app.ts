@@ -14,16 +14,24 @@ const app = new Hono<AppEnv>();
 app.use('*', logger());
 app.use('*', cors({ origin: '*', allowMethods: ['GET', 'POST', 'OPTIONS'] }));
 
-app.get('/health', (c) => c.json({ status: 'ok', timestamp: Date.now() }));
+// Health Check - multiple paths for compatibility
+const health = (c: any) => c.json({ status: 'ok', timestamp: Date.now() });
+app.get('/health', health);
+app.get('/api/health', health);
 
+// Heartbeat API
 app.post('/api/heartbeat', async (c) => {
   const storage = c.get('storage');
   return handleHeartbeat(c.req.raw, storage, {});
 });
 
+// Badge API
 app.get('/api/badge', async (c) => {
   const storage = c.get('storage');
   return handleBadge(c.req.raw, storage, {});
 });
+
+// Fallback for Vercel rewrites where the path might become just '/'
+app.get('/', health);
 
 export { app };
