@@ -1,12 +1,10 @@
 import { handle } from 'hono/netlify';
-import { app } from '../app';
-import { NetlifyBlobsStorage } from '../storage/netlify-blobs';
+import { app } from '../core/app';
+import { NetlifyBlobsStorage } from '../infrastructure/storage/netlify';
 
 app.use('/api/*', async (c, next) => {
-  const blob = await import('@netlify/blobs').then(m => 
-    m.getStore({ name: 'pulse' })
-  );
-  c.set('storage', new NetlifyBlobsStorage(blob));
+  const store = await import('@netlify/blobs').then(m => m.getStore({ name: 'pulse' }));
+  c.set('storage', new NetlifyBlobsStorage(store));
   await next();
 });
 

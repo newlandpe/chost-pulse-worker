@@ -1,5 +1,5 @@
-import { app } from '../app';
-import { CloudflareKVStorage } from '../storage/cloudflare-kv';
+import { app } from '../core/app';
+import { CloudflareKVStorage } from '../infrastructure/storage/cloudflare';
 
 interface Env {
   PULSE_KV: KVNamespace;

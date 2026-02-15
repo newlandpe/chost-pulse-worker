@@ -1,9 +1,7 @@
-import { handle } from 'hono/vercel';
-import { app } from '../app';
-import { VercelKVStorage } from '../storage/vercel-kv';
+import { handle } from '@hono/node-server/vercel';
+import { app } from '../core/app';
+import { VercelKVStorage } from '../infrastructure/storage/vercel';
 import Redis from 'ioredis';
-
-export const runtime = 'edge';
 
 let redisClient: Redis | null = null;
 
@@ -14,13 +12,10 @@ function getRedisClient() {
   return redisClient;
 }
 
-app.use('*', async (c, next) => {
-  if (c.req.path.includes('/api/')) {
-    const client = getRedisClient();
-    if (client) {
-      c.set('storage', new VercelKVStorage(client));
-    }
-  }
+app.use('/api/*', async (c, next) => {
+  const client = getRedisClient();
+  if (!client) return c.json({ error: 'Redis configuration missing' }, 500);
+  c.set('storage', new VercelKVStorage(client));
   await next();
 });
 
