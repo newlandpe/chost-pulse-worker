@@ -1,22 +1,17 @@
-import type { BlobStore } from '@netlify/blobs';
-import type { Storage } from './index';
+import { Storage } from '../../core/storage';
 
 export class NetlifyBlobsStorage implements Storage {
-  constructor(private blob: BlobStore) {}
+  constructor(private store: any) {}
 
   async get(key: string): Promise<string | null> {
-    const result = await this.blob.get(key);
-    if (!result) {
-      return null;
-    }
-    return result.text();
+    return await this.store.get(key);
   }
 
-  async put(key: string, value: string, ttl?: number): Promise<void> {
-    await this.blob.set(key, value, ttl ? { ttl } : undefined);
+  async put(key: string, value: string): Promise<void> {
+    await this.store.set(key, value);
   }
 
   async delete(key: string): Promise<void> {
-    await this.blob.delete(key);
+    await this.store.delete(key);
   }
 }
