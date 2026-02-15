@@ -37,15 +37,17 @@ export const handler = async (req: any, res: any) => {
       return;
     }
 
-    // Read body once for Node.js
-    let body: any = null;
-    if (req.method === 'POST') {
-      const chunks = [];
-      for await (const chunk of req) {
-        chunks.push(chunk);
-      }
-      body = Buffer.concat(chunks);
-    }
+    // Standard Node.js way to collect body
+    const bodyPromise = new Promise((resolve, reject) => {
+      let data = Buffer.alloc(0);
+      req.on('data', (chunk: Buffer) => {
+        data = Buffer.concat([data, chunk]);
+      });
+      req.on('end', () => resolve(data));
+      req.on('error', reject);
+    });
+
+    const body = req.method === 'POST' ? await bodyPromise : null;
 
     const webReq = new Request(url.toString(), {
       method: req.method,
