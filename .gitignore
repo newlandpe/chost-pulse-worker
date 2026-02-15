@@ -38,3 +38,9 @@ coverage/
 .cloudflare/
 worker-configuration.d.ts
 .env*.local
+
+# Local Netlify folder
+.netlify
+.vercel
+api/*.js
+deno.lock

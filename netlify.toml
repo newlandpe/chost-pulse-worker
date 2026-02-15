@@ -1,12 +1,14 @@
 [build]
-  command = "npm run build:netlify"
+  command = "npm run build:bundle"
   publish = "dist"
-  functions = "api"
 
 [build.environment]
   NODE_VERSION = "20"
 
+[functions]
+  directory = "src/platforms"
+
 [[redirects]]
   from = "/*"
-  to = "/.netlify/functions/index"
+  to = "/.netlify/functions/netlify"
   status = 200

@@ -1,11 +1,13 @@
-import { handle } from 'hono/vercel';
+import { handle } from '@hono/node-server/vercel';
 import { app } from '../src/core/app';
 import { RedisStorage } from '../src/infrastructure/storage/vercel';
 
-export const runtime = 'edge';
-
-app.use('*', async (c, next) => {
-  if (process.env.REDIS_URL) c.set('storage', new RedisStorage(process.env.REDIS_URL));
+// This middleware MUST run before the routes in app.ts
+app.use('/api/*', async (c, next) => {
+  const url = process.env.REDIS_URL;
+  if (url) {
+    c.set('storage', new RedisStorage(url));
+  }
   await next();
 });
 

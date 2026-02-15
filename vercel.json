@@ -1,7 +1,9 @@
 {
-  "buildCommand": "npm run build:vercel",
-  "outputDirectory": "dist",
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": null,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
+    { "source": "/health", "destination": "/api/index" },
+    { "source": "/api/(.*)", "destination": "/api/index" }
   ]
 }

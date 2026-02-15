@@ -6,8 +6,7 @@
     "dev:cf": "wrangler dev src/platforms/cloudflare.ts",
     "dev:vercel": "vercel dev",
     "dev:netlify": "netlify dev",
-    "build:vercel": "esbuild api/index.ts --bundle --format=esm --outfile=dist/index.js --platform=node --external:ioredis",
-    "build:cf": "tsc --project tsconfig.json",
+    "build:bundle": "esbuild api/index.ts --bundle --format=esm --outfile=dist/index.js --platform=node --external:ioredis",
     "test": "vitest run"
   },
   "dependencies": {
