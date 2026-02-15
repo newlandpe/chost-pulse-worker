@@ -8,7 +8,7 @@ const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-export default async function handler(req: any, res: any) {
+export const handler = async (req: any, res: any) => {
   // Handle Web API (Netlify Edge/Standard)
   if (typeof Request !== 'undefined' && req instanceof Request) {
     return handleWebConnection(req);
