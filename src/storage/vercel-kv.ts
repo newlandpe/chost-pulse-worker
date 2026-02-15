@@ -1,23 +1,22 @@
-import type { KvValue } from '@vercel/kv';
 import type { Storage } from './index';
+import type { Redis } from 'ioredis';
 
 export class VercelKVStorage implements Storage {
-  constructor(private kv: { get: (key: string) => Promise<KvValue>; set: (key: string, value: string, options?: { ex?: number }) => Promise<void>; del: (key: string) => Promise<number> }) {}
+  constructor(private redis: Redis) {}
 
   async get(key: string): Promise<string | null> {
-    const value = await this.kv.get(key);
-    if (value === null || value === undefined) {
-      return null;
-    }
-    return String(value);
+    return await this.redis.get(key);
   }
 
   async put(key: string, value: string, ttl?: number): Promise<void> {
-    const options = ttl ? { ex: ttl } : undefined;
-    await this.kv.set(key, value, options);
+    if (ttl) {
+      await this.redis.set(key, value, 'EX', ttl);
+    } else {
+      await this.redis.set(key, value);
+    }
   }
 
   async delete(key: string): Promise<void> {
-    await this.kv.del(key);
+    await this.redis.del(key);
   }
 }
