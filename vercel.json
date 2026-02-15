@@ -1,11 +1,5 @@
 {
-  "functions": {
-    "src/entry/vercel.ts": {
-      "runtime": "@vercel/node"
-    }
-  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "src/entry/vercel.ts" }
-  ],
-  "outputDirectory": "dist"
+    { "source": "/(.*)", "destination": "/api/index.js" }
+  ]
 }
