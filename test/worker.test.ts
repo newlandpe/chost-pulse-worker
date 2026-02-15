@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { derivePublicId, sha256 } from '../src/security/crypto';
-import { validatePublicId, validateSecretToken } from '../src/security/validator';
-import { getColorForMetric } from '../src/utils/colors';
+import { derivePublicId, sha256 } from '../src/core/security/crypto';
+import { validatePublicId, validateSecretToken } from '../src/core/security/validator';
+import { getColorForMetric } from '../src/core/utils/colors';
 
 describe('Crypto Functions', () => {
   it('should derive public ID from secret token', async () => {
