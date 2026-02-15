@@ -4,7 +4,7 @@
   "description": "Serverless worker for game server monitoring with multi-platform support",
   "main": "src/entry/cloudflare.ts",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev:cf": "wrangler dev",
     "deploy": "wrangler deploy",
     "deploy:dev": "wrangler deploy --env development",
     "deploy:prod": "wrangler deploy --env production",
@@ -12,7 +12,7 @@
     "dev:netlify": "netlify dev",
     "build": "npm run build:cloudflare",
     "build:cloudflare": "tsc --project tsconfig.json",
-    "build:vercel": "esbuild src/entry/vercel.ts --bundle --format=esm --outfile=api/index.js --platform=neutral --external:@vercel/kv --external:@netlify/blobs",
+    "build:vercel": "esbuild src/entry/vercel.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
     "build:netlify": "esbuild src/entry/netlify.ts --bundle --format=esm --outfile=api/index.js --platform=neutral --external:@vercel/kv --external:@netlify/blobs",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -32,6 +32,7 @@
     "@vercel/kv": "^3.0.0",
     "badge-maker": "^5.0.2",
     "esbuild": "^0.24.0",
+    "ioredis": "^5.9.3",
     "simple-icons": "^16.7.0"
   },
   "devDependencies": {
