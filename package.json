@@ -2,28 +2,17 @@
   "name": "chost-pulse-worker",
   "version": "1.0.0",
   "description": "Serverless worker for game server monitoring with multi-platform support",
-  "main": "src/entry/cloudflare.ts",
+  "main": "src/runtimes/cloudflare.ts",
   "scripts": {
     "dev:cf": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "deploy:cf": "wrangler deploy",
     "dev:vercel": "vercel dev",
     "dev:netlify": "netlify dev",
-    "build:cloudflare": "tsc --project tsconfig.json",
-    "build:vercel": "esbuild src/entry/vercel.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
-    "build:netlify": "esbuild src/entry/netlify.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs",
+    "build:vercel": "esbuild src/api/index.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
+    "build:netlify": "esbuild src/runtimes/netlify.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs",
     "test": "vitest run",
-    "test:watch": "vitest watch",
-    "cf-typegen": "wrangler types"
+    "test:watch": "vitest watch"
   },
-  "keywords": [
-    "cloudflare",
-    "worker",
-    "monitoring",
-    "badge",
-    "pocketmine"
-  ],
-  "author": "ChernegaSergiy",
-  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "@hono/node-server": "^1.19.9",
     "@netlify/blobs": "^8.1.0",

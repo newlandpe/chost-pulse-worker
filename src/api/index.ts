@@ -12,10 +12,13 @@ function getRedisClient() {
   return redisClient;
 }
 
-app.use('/api/*', async (c, next) => {
-  const client = getRedisClient();
-  if (!client) return c.json({ error: 'Redis configuration missing' }, 500);
-  c.set('storage', new VercelKVStorage(client));
+app.use('*', async (c, next) => {
+  if (c.req.path.includes('/api/')) {
+    const client = getRedisClient();
+    if (client) {
+      c.set('storage', new VercelKVStorage(client));
+    }
+  }
   await next();
 });
 
