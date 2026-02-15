@@ -1,7 +1,12 @@
 {
-  "buildCommand": "npm run build:vercel",
-  "outputDirectory": "dist",
+  "functions": {
+    "src/entry/vercel.ts": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
-  ]
+    { "source": "/health", "destination": "/src/entry/vercel.ts" },
+    { "source": "/api/(.*)", "destination": "/src/entry/vercel.ts" }
+  ],
+  "outputDirectory": "dist"
 }
