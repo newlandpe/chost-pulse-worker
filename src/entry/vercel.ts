@@ -12,14 +12,14 @@ function getRedisClient() {
   return redisClient;
 }
 
-app.use('/api/*', async (c, next) => {
-  const client = getRedisClient();
-  if (!client) {
-    return c.json({ error: 'Redis configuration missing' }, 500);
+app.use('*', async (c, next) => {
+  if (c.req.path.includes('/api/')) {
+    const client = getRedisClient();
+    if (client) {
+      c.set('storage', new VercelKVStorage(client));
+    }
   }
-  c.set('storage', new VercelKVStorage(client));
   await next();
 });
 
-export const runtime = 'edge';
 export default handle(app);

@@ -1,15 +1,11 @@
 {
-  "framework": null,
-  "buildCommand": "npm run build:vercel",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index"
+  "functions": {
+    "src/entry/vercel.ts": {
+      "runtime": "@vercel/node"
     }
-  ]
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "src/entry/vercel.ts" }
+  ],
+  "outputDirectory": "dist"
 }
