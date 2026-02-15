@@ -1,9 +1,9 @@
-import { app } from './core/app';
+import { app } from '../core/app';
 import { handle as vercelHandle } from 'hono/vercel';
 import { handle as netlifyHandle } from 'hono/netlify';
-import { CloudflareKVStorage } from './infrastructure/storage/cloudflare';
-import { RedisStorage } from './infrastructure/storage/vercel';
-import { NetlifyBlobsStorage } from './infrastructure/storage/netlify';
+import { CloudflareKVStorage } from '../infrastructure/storage/cloudflare';
+import { RedisStorage } from '../infrastructure/storage/vercel';
+import { NetlifyBlobsStorage } from '../infrastructure/storage/netlify';
 
 // Platform detection and Storage injection middleware
 app.use('*', async (c, next) => {

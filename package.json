@@ -7,7 +7,9 @@
     "dev:cf": "wrangler dev",
     "dev:vercel": "vercel dev",
     "dev:netlify": "netlify dev",
-    "build": "esbuild src/index.ts --bundle --format=esm --outfile=dist/index.js --platform=neutral --external:ioredis",
+    "build": "esbuild src/api/index.ts --bundle --format=esm --outfile=dist/index.js --platform=node --external:ioredis",
+    "build:vercel": "npm run build",
+    "build:netlify": "npm run build",
     "test": "vitest run"
   },
   "dependencies": {
