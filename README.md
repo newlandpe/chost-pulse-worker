@@ -182,7 +182,6 @@ Netlify Blobs are configured automatically - no additional setup required.
 | **Runtime** | Workerd (V8) | Node.js / Edge | Node.js |
 | **Storage** | Cloudflare KV | Redis (ioredis) | Netlify Blobs |
 | **Free Tier Requests** | 100k/day | 100k/month | 125k/month |
-| **Best For** | Global Low Latency | Next.js Ecosystem | Fast JAMstack |
 
 ## API Endpoints
 
