@@ -1,10 +1,12 @@
 [build]
   command = "npm run build:netlify"
   publish = "dist"
+  functions = "api"
 
 [build.environment]
   NODE_VERSION = "20"
 
-[[edge_functions]]
-  path = "/*"
-  function = "index"
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/index"
+  status = 200
