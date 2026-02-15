@@ -1,12 +1,6 @@
 {
-  "functions": {
-    "src/entry/vercel.ts": {
-      "maxDuration": 10
-    }
-  },
   "rewrites": [
-    { "source": "/health", "destination": "/src/entry/vercel.ts" },
-    { "source": "/api/(.*)", "destination": "/src/entry/vercel.ts" }
-  ],
-  "outputDirectory": "dist"
+    { "source": "/health", "destination": "/api/vercel" },
+    { "source": "/api/:path*", "destination": "/api/vercel" }
+  ]
 }

@@ -2,7 +2,7 @@
   "name": "chost-pulse-worker",
   "version": "1.0.0",
   "description": "Serverless worker for game server monitoring with multi-platform support",
-  "main": "src/entry/cloudflare.ts",
+  "main": "src/platforms/cloudflare.ts",
   "scripts": {
     "dev:cf": "wrangler dev",
     "deploy": "wrangler deploy",
@@ -12,8 +12,8 @@
     "dev:netlify": "netlify dev",
     "build": "npm run build:cloudflare",
     "build:cloudflare": "tsc --project tsconfig.json",
-    "build:vercel": "esbuild src/entry/vercel.ts --bundle --format=esm --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
-    "build:netlify": "esbuild src/entry/netlify.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs",
+    "build:vercel": "esbuild src/api/vercel.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
+    "build:netlify": "esbuild src/platforms/netlify.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "cf-typegen": "wrangler types"
