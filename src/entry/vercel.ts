@@ -1,7 +1,9 @@
-import { handle } from '@hono/node-server/vercel';
+import { handle } from 'hono/vercel';
 import { app } from '../app';
 import { VercelKVStorage } from '../storage/vercel-kv';
 import Redis from 'ioredis';
+
+export const runtime = 'edge';
 
 let redisClient: Redis | null = null;
 

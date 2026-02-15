@@ -12,7 +12,7 @@
     "dev:netlify": "netlify dev",
     "build": "npm run build:cloudflare",
     "build:cloudflare": "tsc --project tsconfig.json",
-    "build:vercel": "esbuild src/entry/vercel.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
+    "build:vercel": "esbuild src/entry/vercel.ts --bundle --format=esm --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
     "build:netlify": "esbuild src/entry/netlify.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -28,10 +28,12 @@
   "author": "ChernegaSergiy",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
+    "@hono/node-server": "^1.19.9",
     "@netlify/blobs": "^8.1.0",
     "@vercel/kv": "^3.0.0",
     "badge-maker": "^5.0.2",
     "esbuild": "^0.24.0",
+    "hono": "^4.11.9",
     "ioredis": "^5.9.3",
     "simple-icons": "^16.7.0"
   },
