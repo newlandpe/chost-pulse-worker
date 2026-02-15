@@ -8,7 +8,7 @@
     "deploy:cf": "wrangler deploy",
     "dev:vercel": "vercel dev",
     "dev:netlify": "netlify dev",
-    "build:vercel": "esbuild src/api/index.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
+    "build:vercel": "esbuild src/api/index.ts --bundle --format=cjs --outfile=api/main.js --platform=node --external:@vercel/kv --external:@netlify/blobs --external:ioredis",
     "build:netlify": "esbuild src/runtimes/netlify.ts --bundle --format=cjs --outfile=api/index.js --platform=node --external:@vercel/kv --external:@netlify/blobs",
     "test": "vitest run",
     "test:watch": "vitest watch"
