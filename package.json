@@ -14,7 +14,7 @@
     "badge-maker": "^5.0.2",
     "esbuild": "^0.24.0",
     "hono": "^4.11.9",
-    "ioredis": "^5.9.3",
+    "ioredis": "^5.10.0",
     "simple-icons": "^16.10.0"
   },
   "devDependencies": {
