@@ -15,7 +15,7 @@
     "esbuild": "^0.27.3",
     "hono": "^4.12.11",
     "ioredis": "^5.10.0",
-    "simple-icons": "^16.10.0"
+    "simple-icons": "^16.15.0"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.13.5",
