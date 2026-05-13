@@ -1,5 +1,7 @@
 # ChostPulse
 
+[![License: CSSM Unlimited License v2.0](https://img.shields.io/badge/License-CSSM%20Unlimited%20License%20v2.0-blue.svg?logo=opensourceinitiative)](LICENSE)
+
 ChostPulse is a serverless backend for real-time game server monitoring and SVG badge generation. Supports Cloudflare Workers, Vercel, and Netlify with distributed storage and SHA-256 encryption.
 
 ## Features
