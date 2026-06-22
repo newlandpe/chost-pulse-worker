@@ -12,7 +12,7 @@
   "dependencies": {
     "@hono/node-server": "^2.0.4",
     "badge-maker": "^5.0.2",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "hono": "^4.12.25",
     "ioredis": "^5.11.1",
     "simple-icons": "^16.23.0"
