@@ -18,7 +18,7 @@
     "simple-icons": "^16.24.1"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.16.15",
+    "@cloudflare/vitest-pool-workers": "^0.16.20",
     "@cloudflare/workers-types": "^4.20260609.1",
     "@types/node": "^25.9.3",
     "typescript": "^6.0.3",
