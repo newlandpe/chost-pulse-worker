@@ -1,4 +1,4 @@
-# ChostPulse
+# ChostPulse Worker
 
 [![License: CSSM Unlimited License v2.0](https://img.shields.io/badge/License-CSSM%20Unlimited%20License%20v2.0-blue.svg?logo=opensourceinitiative)](LICENSE)
 [![Mentioned in Awesome Badges](https://awesome.re/mentioned-badge.svg)](https://github.com/badges/awesome-badges)
