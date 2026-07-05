@@ -3,7 +3,7 @@
 [![License: CSSM Unlimited License v2.0](https://img.shields.io/badge/License-CSSM%20Unlimited%20License%20v2.0-blue.svg?logo=opensourceinitiative)](LICENSE)
 [![Mentioned in Awesome Badges](https://awesome.re/mentioned-badge.svg)](https://github.com/badges/awesome-badges)
 
-ChostPulse is a serverless backend for real-time game server monitoring and SVG badge generation. Supports Cloudflare Workers, Vercel, and Netlify with distributed storage and SHA-256 encryption.
+**ChostPulse** is a serverless backend for real-time game server monitoring and SVG badge generation. Supports Cloudflare Workers, Vercel, and Netlify with distributed storage and SHA-256 encryption.
 
 ## Features
 
