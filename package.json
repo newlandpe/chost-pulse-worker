@@ -13,7 +13,7 @@
     "@hono/node-server": "^2.0.8",
     "badge-maker": "^6.0.0",
     "esbuild": "^0.28.0",
-    "hono": "^4.12.27",
+    "hono": "^4.12.30",
     "ioredis": "^5.11.1",
     "simple-icons": "^16.25.0"
   },
